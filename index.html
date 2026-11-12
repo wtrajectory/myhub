@@ -13,10 +13,19 @@
     });
   })();
 </script>
+<script>
+  /* 於首次繪製前先套用系統偏好，避免深色系統出現淺色閃光（FOUC） */
+  (function () {
+    try {
+      var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    } catch (e) {}
+  })();
+</script>
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#eef3fa">
 <title>Cleanhands HUB</title>
-<meta name="description" content="澳門國際機場抵澳與離澳航班、氣象觀測與天氣警告、街道歷史，以及旅遊局旅遊快訊活動資訊、市政署餐飲場所名單與旅遊局五類牌照場所資訊。">
+<meta name="description" content="澳門國際機場抵澳與離澳航班、氣象觀測與天氣警告、街道歷史，以及旅遊局旅遊快訊活動資訊、市政署餐飲場所名單、旅遊局五類牌照場所資訊，以及交通事務局全澳巴士站與行經路線查詢。">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230f1c30'/%3E%3Ctext x='32' y='44' font-size='34' font-family='serif' fill='%234fd1bd' text-anchor='middle'%3EI%3C/text%3E%3C/svg%3E">
 <style>
   :root {
@@ -261,7 +270,7 @@
   @media (max-width: 900px) {
     .top-row { grid-template-columns: minmax(0, 1fr); }
   }
-  .street-panel, .tour-panel, .dining-panel, .license-panel, .registry-panel { margin-bottom: clamp(18px, 2.4vw, 26px); }
+  .street-panel, .tour-panel, .dining-panel, .license-panel, .registry-panel, .bus-panel { margin-bottom: clamp(18px, 2.4vw, 26px); }
 
   /* ---------------- 墨綠玻璃框 ---------------- */
   .flight-glass {
@@ -557,6 +566,7 @@
 
 <nav class="shell view-tabs" aria-label="資訊分類">
   <button class="view-tab is-active" type="button" data-view="weather" aria-pressed="true" aria-controls="view-weather">天氣預報</button>
+  <button class="view-tab" type="button" data-view="bus" aria-pressed="false" aria-controls="view-bus">巴士站</button>
   <button class="view-tab" type="button" data-view="registry" aria-pressed="false" aria-controls="view-registry"><img class="tab-ico" src="https://www.macaotourism.gov.mo/static/logo/mgto.svg" alt=""><img class="tab-ico" src="https://www.gov.mo/zh-hant/wp-content/uploads/sites/4/2021/01/IAM-logo_2019-_C03-300x300.png" alt="">牌照場所</button>
   <button class="view-tab" type="button" data-view="tour" aria-pressed="false" aria-controls="view-tour">旅遊快訊</button>
   <button class="view-tab" type="button" data-view="flights" aria-pressed="false" aria-controls="view-flights">飛機起降</button>
@@ -654,9 +664,13 @@
     <macau-tour-widget refresh="300" theme="light" limit="9" no-auto></macau-tour-widget>
   </div>
 
+  <div class="bus-panel view-panel" id="view-bus" data-view-panel="bus" hidden>
+    <macau-busstops-widget theme="light" limit="24" no-auto></macau-busstops-widget>
+  </div>
   <div class="registry-panel view-panel" id="view-registry" data-view-panel="registry" hidden>
     <macau-registry-widget refresh="300" theme="light" no-auto></macau-registry-widget>
   </div>
+
 
 </main>
 
@@ -5725,6 +5739,1068 @@
 
 
 <script>
+/**
+ * macau-busstops-widget.js
+ * 交通事務局｜巴士路線資料 BUS_POLE.SHP —— 全澳巴士站查詢（無內建資料）
+ *
+ * 官方資料來源：澳門政府數據開放平台「巴士路線資料」
+ *   https://data.gov.mo/Detail?id=e7b2e84d-3333-42f0-b676-64ce95306f0d
+ *   目錄中繼資料 https://api.data.gov.mo/document/download/<id>?isNeedFile=0&lang=TC
+ *   官方資料檔案 https://api.data.gov.mo/document/download/<id>?isNeedFile=1&lang=TC
+ *
+ * 官方資料集沒有 JSON API（url 為空陣列），只提供 Shapefile 壓縮檔；但上述兩個
+ * 官方端點會回應 Access-Control-Allow-Origin，且不需要 token，因此瀏覽器可以直接
+ * 取得「當下」的官方檔案，不必內建快照、不必架後端、不必用第三方代理。
+ *
+ * 負擔控制：
+ *   1. 只有切到「巴士站」分類才開始連線（IntersectionObserver + 分頁按鈕）；
+ *   2. 每次先只抓約 0.6KB 的目錄中繼資料，比對官方版本（updateTime）；
+ *   3. 版本相同就讀 localStorage 快取，完全不下載壓縮檔；
+ *   4. 版本變動才下載一次官方 ZIP，在瀏覽器內解出 BUS_POLE.dbf 並解析；
+ *   5. 不輪詢、不設計時器、不自動更新；全站重整按鈕才會重新核對官方版本。
+ *   6. 連線失敗時降級：有快取就標註後顯示，沒有快取就顯示錯誤與官方連結。
+ *
+ * 站牌彙整為站點，可用「依站點／逐站牌」切換；皆支援站名、站號、站牌編號、
+ * 葡英名與路線搜尋。實際筆數一律以官方當下檔案為準，不在程式內寫死。
+ *
+ * 可用屬性：theme／title／limit／no-auto
+ * 公開方法：element.refresh()
+ * 對外事件：macau-bus:update、macau-bus:error（bubbles + composed）
+ */
+(function () {
+  'use strict';
+
+  if (window.customElements && window.customElements.get('macau-busstops-widget')) return;
+
+  var DATASET_ID = 'e7b2e84d-3333-42f0-b676-64ce95306f0d';
+  var CATALOG_URL = 'https://data.gov.mo/Detail?id=' + DATASET_ID;
+  var API_BASE = 'https://api.data.gov.mo/document/download/' + DATASET_ID;
+  var META_URL = API_BASE + '?isNeedFile=0&lang=TC';
+  var FILE_URL = API_BASE + '?isNeedFile=1&lang=TC';
+  var CACHE_KEY = 'macau-bus:official:v4';
+
+  var GOOGLE_MAP = 'https://www.google.com/maps/search/';
+  var DSAT_HOME = 'https://www.dsat.gov.mo/';
+  var BUS_HOME = 'https://www.dsat.gov.mo/bus';
+  var BUS_ARRIVAL = 'https://www.dsat.gov.mo/dsat/redirect.aspx?a_id=700022';
+  var BUS_POINT = 'https://www.dsat.gov.mo/dsat/redirect.aspx?a_id=700023';
+  var BUS_ZONE = 'https://www.dsat.gov.mo/dsat/redirect.aspx?a_id=700024';
+
+  /* 交通事務局 H5 巴士站地圖，可用 busCode 直接定位站點。
+     實測（2026-11）：參數必須寫在 hash 內（#/busMapSearch?busCode=…）；若寫成
+     ?busCode=… 會被 getUrlParams 連同 #/… 讀成同一個值而失效。站號比對是字串
+     完全相等、區分大小寫，比對不到就只顯示全澳地圖，不會報錯。 */
+  var BUS_H5 = 'https://dis.dsat.gov.mo:8017/stc/h5dsat/';
+  /* H5 認的是「站點／車道」編號（如 M1/2），但 BUS_POLE 的 ALIAS 對多車道站點
+     只給主站號（M1），兩者對不上就無法定位。下表是 ALIAS 與官方站號不一致的
+     站號對照（2026-11 以 listBusStation.htm 逐筆核對，79 個站號涵蓋 80 個站點
+     分組；457 組中 456 組可定位，僅 TEMP_17 臨時站官方無對應站號，故不提供
+     連結）。未列出的站點直接以 ALIAS 查詢。日後 H5 改號只需刪去失效項，其餘
+     站點仍可正常定位。 */
+  var CODE_FIX = (function () {
+    var map = {};
+    ('C654:C654/1,C669:C669/1,C688:C688/1,C689:C689/1,C690:C690/2,M1:M1/2,M108:M108/1,' +
+      'M120:M120/2,M132:M132/1,M135:M135/2,M136:M136/1,M137:M137/1,M139:M139/1,M140:M140/1,' +
+      'M144:M144/1,M145:M145/1,M158:M158/1,M16:M16/2,M160:M160/1,M170:M170/1,M171:M171/1,' +
+      'M172:M172/1,M18:M18/7,M182:M182/1,M183:M183/2,M185:M185/2,M186:M186/2,M2:M2/1,' +
+      'M20:M20/2,M203:M203/1,M209:M209/1,M21:M21/1,M222:M222/1,M235:M235/1,M239:M239/1,' +
+      'M26:M26/1,M270:M270/1,M28:M28/1,M3:M3/1,M32:M32/2,M35:M35/1,M4:M4/1,M46:M46/1,' +
+      'M61:M61/1,M62:M62/1,M69:M69/1,M7:M7/1,M73:M73/2,M76:M76/1,M800:M800/8,M84:M84/1,' +
+      'M9:M9/1,M95:M95/2,T308:T308/1,T310:T310/1,T311:T311/1,T314:T314/2,T321:T321/2,' +
+      'T324:T324/1,T325:T325/2,T326:T326/1,T330:T330/1,T332:T332/1,T336:T336/1,T339:T339/2,' +
+      'T345:T345/1,T355:T355/2,T356:T356/1,T363:T363/1,T364:T364/1,T365:T365/2,T373:T373/1,' +
+      'T376:T376/1,T408:T408/1,T432:T432/2,T550:T550/1,T551:T551/1,T555:T555/2,T560:T560/1')
+      .split(',').forEach(function (pair) {
+        var i = pair.indexOf(':');
+        if (i > 0) map[pair.slice(0, i)] = pair.slice(i + 1);
+      });
+    return map;
+  })();
+
+  /* 目前顯示中的官方資料；程式本身不含任何站點資料 */
+  var DATA = {
+    stops: [], version: '', fileDate: '', department: '交通事務局',
+    fetchedAt: '', fromCache: false, stale: false, reason: ''
+  };
+
+  var LINKS = [
+    { name: '交通事務局｜巴士', desc: '官方巴士資訊總覽', href: BUS_HOME },
+    { name: '巴士報站', desc: '即時到站資訊', href: BUS_ARRIVAL },
+    { name: '點對點查詢', desc: '規劃乘車路線', href: BUS_POINT },
+    { name: '巴士站分區資料', desc: '依分區查閱站點', href: BUS_ZONE },
+    { name: '巴士路線資料', desc: '政府開放數據集', href: CATALOG_URL },
+    { name: '交通事務局', desc: '部門首頁', href: DSAT_HOME }
+  ];
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function clean(s) { return String(s == null ? '' : s).replace(/\s+/g, ' ').trim(); }
+  function trim(s) { return String(s == null ? '' : s).replace(/^\s+|\s+$/g, ''); }
+  /* 官方資料有 1 個臨時站號特別長，卡片內只顯示前綴，完整值放在 title 與搜尋索引 */
+  function shortCode(v) {
+    var t = clean(v);
+    var m = /^([A-Za-z]+\d+)/.exec(t);
+    return (m && t.length > 7) ? m[1] + '…' : t;
+  }
+  function clampInt(n, min, max, fallback) {
+    n = parseInt(n, 10);
+    return isFinite(n) ? Math.min(max, Math.max(min, n)) : fallback;
+  }
+  function num(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+  /* BUS_POLE.SHP 的點座標是 Macau Grid（見官方 BUS_POLE.prj：D_Macau、
+     International 1924、橫軸墨卡托，中央經線 113.5364694、原點緯度 22.21239722、
+     假東假北各 20000 公尺），Google 地圖要的是 WGS84 經緯度，因此先在頁面內反算
+     投影，再加上 D_Macau → WGS84 的平移量（以交通事務局 217 個站點的官方經緯度
+     回歸，殘差中位數約 5 公尺、九成在 18 公尺內，足以對準站牌）。 */
+  var GRID_A = 6378388, GRID_F = 297, GRID_FE = 20000, GRID_FN = 20000;
+  var GRID_E2 = 2 / GRID_F - 1 / (GRID_F * GRID_F);
+  var GRID_LAT0 = 22.21239722 * Math.PI / 180;
+  var GRID_LON0 = 113.5364694 * Math.PI / 180;
+  var GRID_DLAT = -0.001196, GRID_DLNG = 0.003001;
+
+  /* Macau Grid → [經度, 緯度]；帶入的是 WGS84 座標，可直接給 Google 地圖 */
+  function gridToLngLat(x, y) {
+    var e2 = GRID_E2, e4 = e2 * e2, e6 = e4 * e2;
+    var M = y - GRID_FN + GRID_A * (
+      (1 - e2 / 4 - 3 * e4 / 64 - 5 * e6 / 256) * GRID_LAT0
+      - (3 * e2 / 8 + 3 * e4 / 32 + 45 * e6 / 1024) * Math.sin(2 * GRID_LAT0)
+      + (15 * e4 / 256 + 45 * e6 / 1024) * Math.sin(4 * GRID_LAT0)
+      - (35 * e6 / 3072) * Math.sin(6 * GRID_LAT0));
+    var mu = M / (GRID_A * (1 - e2 / 4 - 3 * e4 / 64 - 5 * e6 / 256));
+    var e1 = (1 - Math.sqrt(1 - e2)) / (1 + Math.sqrt(1 - e2));
+    var p1 = mu
+      + (3 * e1 / 2 - 27 * Math.pow(e1, 3) / 32) * Math.sin(2 * mu)
+      + (21 * e1 * e1 / 16 - 55 * Math.pow(e1, 4) / 32) * Math.sin(4 * mu)
+      + (151 * Math.pow(e1, 3) / 96) * Math.sin(6 * mu);
+    var sinp = Math.sin(p1), cosp = Math.cos(p1), tanp = Math.tan(p1);
+    var C1 = e2 * cosp * cosp / (1 - e2), T1 = tanp * tanp;
+    var N1 = GRID_A / Math.sqrt(1 - e2 * sinp * sinp);
+    var R1 = GRID_A * (1 - e2) / Math.pow(1 - e2 * sinp * sinp, 1.5);
+    var D = (x - GRID_FE) / N1;
+    var lat = p1 - (N1 * tanp / R1) * (D * D / 2
+      - (5 + 3 * T1 + 10 * C1 - 4 * C1 * C1 - 9 * e2) * Math.pow(D, 4) / 24
+      + (61 + 90 * T1 + 298 * C1 + 45 * T1 * T1 - 252 * e2 - 3 * C1 * C1) * Math.pow(D, 6) / 720);
+    var lng = GRID_LON0 + (D
+      - (1 + 2 * T1 + C1) * Math.pow(D, 3) / 6
+      + (5 - 2 * C1 + 28 * T1 - 3 * C1 * C1 + 8 * e2 + 24 * T1 * T1) * Math.pow(D, 5) / 120) / cosp;
+    return [lng * 180 / Math.PI + GRID_DLNG, lat * 180 / Math.PI + GRID_DLAT];
+  }
+
+  function mapUrl(o) {
+    var x = Number(o && o.x), y = Number(o && o.y);
+    var q = '';
+    if (isFinite(x) && isFinite(y) && x && y) {
+      var ll = gridToLngLat(x, y);
+      q = ll[1].toFixed(6) + ',' + ll[0].toFixed(6);
+    } else {
+      q = clean(o && o.n) ? '澳門 ' + clean(o.n) : '';
+    }
+    return GOOGLE_MAP + (q ? '?api=1&query=' + encodeURIComponent(q) : '');
+  }
+  function searchIcon() {
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" ' +
+      'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4 4"/></svg>';
+  }
+
+  /* 官方 H5 用的站號：先去掉官方資料附加的括號註記，再套用站號對照表。
+     沒有對照項就沿用 ALIAS（H5 查不到時只會停在全澳地圖，不會出錯）；
+     帶底線的是臨時站編號（如 TEMP_17），H5 沒有這種站號，直接不提供連結。 */
+  function stationCode(v) {
+    var c = clean(v).replace(/[（(].*$/, '').trim();
+    if (!c) return '';
+    if (CODE_FIX[c]) return CODE_FIX[c];
+    return c.indexOf('_') >= 0 ? '' : c;
+  }
+
+  /* 站號前綴分區：M＝澳門半島、T＝氹仔、C＝路環，其餘（如 TEMP）置於最後；
+     同區內再比數字，避免 M100 排在 M11 之前 */
+  var ZONE = { M: 0, T: 1, C: 2 };
+  function natKey(v) {
+    var m = /^([A-Za-z]*)(\d+)(.*)$/.exec(clean(v).toUpperCase());
+    return m ? [m[1], parseInt(m[2], 10), m[3]] : [clean(v).toUpperCase(), 0, ''];
+  }
+  function zone(v) {
+    var k = natKey(v)[0];
+    return Object.prototype.hasOwnProperty.call(ZONE, k) ? ZONE[k] : 3;
+  }
+  function natCmp(a, b) {
+    var x = natKey(a), y = natKey(b);
+    var z = zone(a) - zone(b);
+    if (z) return z;
+    if (x[0] !== y[0]) return x[0] < y[0] ? -1 : 1;
+    if (x[1] !== y[1]) return x[1] - y[1];
+    if (x[2] !== y[2]) return x[2] < y[2] ? -1 : 1;
+    return 0;
+  }
+
+  var STOPS = [], GROUPS = [], SITES = 0;
+
+  /* 由官方檔案解析出的站牌陣列重建搜尋索引；筆數完全跟著官方資料走 */
+  function applyData(raw) {
+    var rows = (raw || []).map(function (s, i) {
+      var routes = String(s.r || '').split(/[,，]/).map(trim).filter(Boolean);
+      var n = clean(s.n), e = clean(s.e), p = clean(s.p), a = clean(s.a), c = clean(s.c);
+      return {
+        k: i, id: clean(s.i), n: n, e: e, p: p, a: a, c: c, routes: routes,
+        dc: stationCode(a || c),
+        x: Number(s.x) || 0, y: Number(s.y) || 0,
+        ln: n.toLowerCase(), la: a.toLowerCase(), lc: c.toLowerCase(),
+        key: [n, e, p, a, c, String(s.r || '')].join(' ').toLowerCase()
+      };
+    }).sort(function (a, b) {
+      return natCmp(a.a, b.a) || natCmp(a.c, b.c) || (a.k - b.k);
+    });
+
+    var siteSet = {}, groups = [], groupMap = {};
+    rows.forEach(function (s) {
+      if (s.a) siteSet[s.a] = 1;
+      var key = s.a || s.c;
+      var g = groupMap[key];
+      if (!g) {
+        g = {
+          k: groups.length, a: s.a, c: key, n: s.n, e: s.e, p: s.p,
+          dc: s.dc, poles: [], routes: [], parts: [],
+          ln: s.ln, la: s.la, lc: key.toLowerCase(), id: '',
+          x: s.x || 0, y: s.y || 0
+        };
+        groupMap[key] = g; groups.push(g);
+      }
+      if ((!g.x || !g.y) && s.x && s.y) { g.x = s.x; g.y = s.y; }
+      g.poles.push({ c: s.c, id: s.id, routes: s.routes });
+      g.parts.push([s.n, s.e, s.p, s.a, s.c, s.routes.join(',')].join(' '));
+      s.routes.forEach(function (r) { if (g.routes.indexOf(r) < 0) g.routes.push(r); });
+    });
+    groups.forEach(function (g) {
+      g.key = [g.n, g.e, g.p, g.a, g.parts.join(' ')].join(' ').toLowerCase();
+    });
+    groups.sort(function (a, b) { return natCmp(a.a, b.a) || (a.k - b.k); });
+
+    STOPS = rows;
+    GROUPS = groups;
+    SITES = Object.keys(siteSet).length;
+  }
+
+  function score(s, q) {
+    if (s.la === q || s.lc === q || s.ln === q) return 0;
+    if (s.ln.indexOf(q) === 0 || s.la.indexOf(q) === 0 || s.lc.indexOf(q) === 0) return 1;
+    for (var i = 0; i < s.routes.length; i++) {
+      if (s.routes[i].toLowerCase() === q) return 1;
+    }
+    return s.key.indexOf(q) >= 0 ? 2 : -1;
+  }
+
+  function altName(s) {
+    return [s.e, s.p].filter(function (v, i, a) {
+      return v && v !== s.n && a.indexOf(v) === i;
+    }).join(' · ');
+  }
+  function chips(list, cls, attr, title) {
+    return list.map(function (v) {
+      return '<button type="button" class="' + cls + '" ' + attr + '="' + esc(v) +
+        '" title="' + esc(title + v) + '">' + esc(v) + '</button>';
+    }).join('');
+  }
+  function linksHtml(o) {
+    var code = o.dc || stationCode(o.a || o.c);
+    return '<div class="foot">' +
+      '<span class="links">' +
+        '<a href="' + esc(mapUrl(o)) + '" target="_blank" rel="noopener noreferrer"' +
+          ' title="在 Google 地圖查看「' + esc(o.n) + '」的位置">Google 地圖 ↗</a>' +
+        (code
+          ? '<a href="' + esc(BUS_H5 + '#/busMapSearch?busCode=' + encodeURIComponent(code)) + '"' +
+            ' target="_blank" rel="noopener noreferrer"' +
+            ' title="在交通事務局巴士站地圖定位「' + esc(o.n) + '」（站號 ' + esc(code) + '）">' +
+            '巴士站地圖 ↗</a>'
+          : '') +
+      '</span>' +
+    '</div>';
+  }
+
+  /* 逐站牌模式：一支站牌一張卡，完整呈現站牌編號、ID 與該站牌的路線 */
+  function poleHtml(s) {
+    var alt = altName(s);
+    var routes = chips(s.routes, 'rt', 'data-route', '搜尋所有行經 ');
+    return '<article class="stop">' +
+      '<div class="code" title="' + esc(s.a) + '"><b>' + esc(shortCode(s.a)) + '</b><span>站點</span></div>' +
+      '<div class="body">' +
+        '<div class="line"><h3 title="' + esc(s.n) + '">' + esc(s.n) + '</h3>' +
+          '<span class="pole" title="' + esc(s.c) + '">' + esc(shortCode(s.c)) + '</span></div>' +
+        (alt ? '<div class="alt" title="' + esc(alt) + '">' + esc(alt) + '</div>' : '') +
+        '<div class="meta" title="站牌編號 ' + esc(s.c) + ' · 站牌 ID ' + esc(s.id) +
+          ' · 行經 ' + s.routes.length + ' 條路線">站牌編號 <b>' + esc(shortCode(s.c)) +
+          '</b> · 站牌 ID <b>' + esc(s.id) + '</b> · 行經 <b>' + s.routes.length +
+          '</b> 條路線</div>' +
+        (routes ? '<div class="routes"><span class="rl">路線</span>' + routes + '</div>' : '') +
+        linksHtml(s) +
+      '</div></article>';
+  }
+
+  /* 依站點模式：一個站點一張卡，列出所有站牌編號與聯集後的路線 */
+  function siteHtml(g) {
+    var alt = altName(g);
+    var routes = chips(g.routes, 'rt', 'data-route', '搜尋所有行經 ');
+    var poles = g.poles.map(function (pp) {
+      return '<button type="button" class="pc" data-query="' + esc(pp.c) +
+        '" title="站牌 ' + esc(pp.c) + ' · ID ' + esc(pp.id) + '">' + esc(shortCode(pp.c)) + '</button>';
+    }).join('');
+    return '<article class="stop">' +
+      '<div class="code" title="' + esc(g.a) + '"><b>' + esc(shortCode(g.a)) + '</b><span>站點</span></div>' +
+      '<div class="body">' +
+        '<div class="line"><h3 title="' + esc(g.n) + '">' + esc(g.n) + '</h3>' +
+          '<span class="pole">' + g.poles.length + ' 個站牌</span></div>' +
+        (alt ? '<div class="alt" title="' + esc(alt) + '">' + esc(alt) + '</div>' : '') +
+        '<div class="meta" title="站點編號 ' + esc(g.a) + ' · 行經 ' + g.routes.length +
+          ' 條路線">站點編號 <b>' + esc(shortCode(g.a)) + '</b> · 行經 <b>' + g.routes.length +
+          '</b> 條路線</div>' +
+        (poles ? '<div class="routes"><span class="rl">站牌</span>' + poles + '</div>' : '') +
+        (routes ? '<div class="routes"><span class="rl">路線</span>' + routes + '</div>' : '') +
+        linksHtml(g) +
+      '</div></article>';
+  }
+
+  /* ================= 官方資料管線（零內建資料） ================= */
+  var DEC = (typeof TextDecoder !== 'undefined') ? new TextDecoder('utf-8') : null;
+
+  function utf8(bytes, a, b) {
+    if (DEC) return DEC.decode(bytes.subarray(a, b));
+    var out = '';
+    for (var i = a; i < b; i++) out += String.fromCharCode(bytes[i]);
+    try { return decodeURIComponent(escape(out)); } catch (e) { return out; }
+  }
+  function strip(v) {
+    return String(v == null ? '' : v).replace(/\0/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+  function retry(task, times, delay) {
+    return task().catch(function (err) {
+      if (times <= 1) throw err;
+      return new Promise(function (resolve) { setTimeout(resolve, delay || 400); })
+        .then(function () { return retry(task, times - 1, delay); });
+    });
+  }
+  /* 官方端點偶爾回 31 bytes 的「內部錯誤」，每次換一個網址避免拿到同一份錯誤回應 */
+  var reqSeq = 0;
+  function bust(url) { return url + '&_=' + Date.now() + '_' + (++reqSeq); }
+
+  /* 用瀏覽器內建 DecompressionStream 解 ZIP 的 deflate 項目，不載入任何外部函式庫 */
+  function inflateRaw(bytes) {
+    if (typeof DecompressionStream === 'undefined' || typeof Response === 'undefined' || typeof Blob === 'undefined') {
+      return Promise.reject(new Error('此瀏覽器不支援內建解壓縮（DecompressionStream），請改用新版 Chrome／Edge／Firefox'));
+    }
+    var stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+    return new Response(stream).arrayBuffer().then(function (buf) { return new Uint8Array(buf); });
+  }
+
+  function zipEntries(bytes) {
+    var dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    var eocd = -1, i;
+    for (i = bytes.length - 22; i >= Math.max(0, bytes.length - 66000); i--) {
+      if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+    }
+    if (eocd < 0) throw new Error('官方壓縮檔格式無法辨識');
+    var n = dv.getUint16(eocd + 10, true), p = dv.getUint32(eocd + 16, true), out = [];
+    for (var k = 0; k < n && p + 46 <= bytes.length; k++) {
+      if (dv.getUint32(p, true) !== 0x02014b50) break;
+      var method = dv.getUint16(p + 10, true);
+      var csize = dv.getUint32(p + 20, true);
+      var nl2 = dv.getUint16(p + 28, true), xl = dv.getUint16(p + 30, true), cl = dv.getUint16(p + 32, true);
+      var lh = dv.getUint32(p + 42, true);
+      var name = utf8(bytes, p + 46, p + 46 + nl2);
+      var off = lh + 30 + dv.getUint16(lh + 26, true) + dv.getUint16(lh + 28, true);
+      out.push({ name: name, method: method, size: csize, off: off });
+      p += 46 + nl2 + xl + cl;
+    }
+    return out;
+  }
+  function findEntry(list, re) {
+    for (var i = 0; i < list.length; i++) if (re.test(list[i].name)) return list[i];
+    return null;
+  }
+  function readEntry(bytes, e) {
+    var part = bytes.subarray(e.off, e.off + e.size);
+    if (e.method === 0) return Promise.resolve(part);
+    if (e.method === 8) return inflateRaw(part);
+    return Promise.reject(new Error('官方壓縮檔使用不支援的壓縮方式'));
+  }
+
+  /* BUS_POLE.dbf（UTF-8，見 BUS_POLE.cpg）→ 緊湊站牌陣列 */
+  function parseDbf(bytes) {
+    var dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    var n = dv.getUint32(4, true), hl = dv.getUint16(8, true), rl = dv.getUint16(10, true);
+    if (!n || !hl || !rl || hl + n * rl > bytes.length) throw new Error('官方 DBF 格式異常');
+    var fields = {}, p = 32, off = 1;
+    while (p < hl && bytes[p] !== 0x0d) {
+      var name = strip(utf8(bytes, p, p + 11));
+      fields[name] = { off: off, len: bytes[p + 16] };
+      off += bytes[p + 16];
+      p += 32;
+    }
+    function val(rec, key) {
+      var f = fields[key];
+      return f ? strip(utf8(rec, f.off, Math.min(f.off + f.len, rec.length))) : '';
+    }
+    var stops = [];
+    for (var i = 0; i < n; i++) {
+      var base = hl + i * rl;
+      if (bytes[base] === 0x2a) continue;
+      var rec = bytes.subarray(base, Math.min(base + rl, bytes.length));
+      var row = {
+        i: val(rec, 'POLE_ID'), c: val(rec, 'P_ALIAS'), a: val(rec, 'ALIAS'),
+        n: val(rec, 'P_NAME'), p: val(rec, 'P_NAME_POR'), e: val(rec, 'P_NAME_EN'),
+        r: val(rec, 'ROUTE_NOS'), _rec: i
+      };
+      if (row.n && row.c) stops.push(row);
+    }
+    if (!stops.length) throw new Error('官方 DBF 沒有可用的站牌資料');
+    return stops;
+  }
+
+  /* BUS_POLE.SHP：點圖徵（shape type 1），逐筆取出 Macau Grid 的 x / y */
+  function parseShp(bytes, expected) {
+    var dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    if (bytes.length < 100 || dv.getInt32(32, true) !== 1) return null;
+    var out = [], p = 100, i = 0;
+    while (p + 28 <= bytes.length && i < expected) {
+      var len = dv.getUint32(p + 4, false) * 2;
+      if (len < 20 || p + 8 + len > bytes.length) break;
+      out.push(dv.getInt32(p + 8, true) === 1
+        ? { x: dv.getFloat64(p + 12, true), y: dv.getFloat64(p + 20, true) }
+        : null);
+      p += 8 + len; i++;
+    }
+    return out;
+  }
+
+  function fetchMeta() {
+    return retry(function () {
+      return fetch(bust(META_URL), { cache: 'no-store', credentials: 'omit', mode: 'cors' })
+        .then(function (r) {
+          if (!r.ok) throw new Error('官方目錄回應 HTTP ' + r.status);
+          return r.json();
+        })
+        .then(function (j) {
+          var d = (j && j.dataDir && j.dataDir[0]) || {};
+          var f = (j && j.file && j.file[0]) || {};
+          if (!d.updateTime && !f.lastUpdateTime) throw new Error('官方目錄中繼資料暫時無法取得');
+          return {
+            version: String(d.updateTime || f.lastUpdateTime),
+            fileDate: String(f.lastUpdateTime || ''),
+            department: String(d.department || '交通事務局')
+          };
+        });
+    }, 4, 500);
+  }
+
+  function fetchOfficialFile() {
+    return retry(function () {
+      return fetch(bust(FILE_URL), { cache: 'no-store', credentials: 'omit', mode: 'cors' })
+        .then(function (r) {
+          if (!r.ok) throw new Error('官方檔案回應 HTTP ' + r.status);
+          var ct = r.headers.get('content-type') || '';
+          if (ct.indexOf('json') >= 0) throw new Error('官方檔案端點暫時回傳錯誤');
+          return r.arrayBuffer();
+        })
+        .then(function (buf) {
+          var bytes = new Uint8Array(buf);
+          if (bytes.length < 100000) throw new Error('官方檔案回應不完整');
+          return bytes;
+        });
+    }, 8, 700);
+  }
+
+  function extractStops(bytes) {
+    var outer = zipEntries(bytes);
+    var innerEntry = findEntry(outer, /ExportShapeFile\.zip$/i);
+    if (!innerEntry) throw new Error('官方檔案缺少 Shapefile 壓縮檔');
+    return readEntry(bytes, innerEntry).then(function (inner) {
+      var list = zipEntries(inner);
+      var dbf = findEntry(list, /BUS_POLE\.DBF$/i);
+      var shp = findEntry(list, /BUS_POLE\.SHP$/i);
+      if (!dbf) throw new Error('官方檔案缺少 BUS_POLE.dbf');
+      return Promise.all([
+        readEntry(inner, dbf),
+        shp ? readEntry(inner, shp) : Promise.resolve(null)
+      ]);
+    }).then(function (parts) {
+      var stops = parseDbf(parts[0]);
+      var coords = parts[1] ? parseShp(parts[1], stops.length) : null;
+      if (coords) {
+        stops.forEach(function (s) {
+          var c = coords[s._rec];
+          if (c) { s.x = c.x; s.y = c.y; }
+          delete s._rec;
+        });
+      }
+      return stops;
+    });
+  }
+
+  function cacheGet() {
+    try {
+      var o = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+      if (o && Array.isArray(o.stops) && o.stops.length && o.version) return o;
+    } catch (e) {}
+    return null;
+  }
+  function cacheSet(o) {
+    try { localStorage.setItem(CACHE_KEY, JSON.stringify(o)); } catch (e) {}
+  }
+
+  /* 連線失敗但有快取時，標註為舊資料後繼續顯示，不讓整個分頁空白 */
+  function staleFrom(cached, err) {
+    return {
+      stops: cached.stops, version: cached.version, fileDate: cached.fileDate || '',
+      department: cached.department || '交通事務局', fetchedAt: cached.fetchedAt || '',
+      fromCache: true, stale: true, reason: (err && err.message) || String(err)
+    };
+  }
+
+  /* 只比對目錄版本；版本相同就不下載官方 ZIP，直接讀本機快取 */
+  function loadOfficial(force) {
+    var cached = cacheGet();
+    return fetchMeta().then(function (meta) {
+      if (!force && cached && cached.version === meta.version) {
+        return {
+          stops: cached.stops, version: meta.version, fileDate: meta.fileDate,
+          department: meta.department, fetchedAt: cached.fetchedAt || '',
+          fromCache: true, stale: false, reason: ''
+        };
+      }
+      return fetchOfficialFile().then(extractStops).then(function (stops) {
+        var fresh = {
+          stops: stops, version: meta.version, fileDate: meta.fileDate,
+          department: meta.department, fetchedAt: new Date().toISOString(),
+          fromCache: false, stale: false, reason: ''
+        };
+        cacheSet(fresh);
+        return fresh;
+      }).catch(function (err) {
+        if (cached) return staleFrom(cached, err);
+        throw err;
+      });
+    }).catch(function (err) {
+      if (cached) return staleFrom(cached, err);
+      throw err;
+    });
+  }
+
+  var STYLE = `
+    :host {
+      --c-text: #eaf6f1; --c-muted: #a9c9bd; --c-faint: #7fa89a;
+      --c-line: rgba(120, 214, 178, .20); --c-tile: rgba(9, 46, 38, .48);
+      --c-tile-2: rgba(13, 58, 48, .62); --c-accent: #63e0b0; --c-accent-2: #8fd8e8;
+      --c-field: rgba(255, 255, 255, .12); --c-field-2: rgba(255, 255, 255, .19);
+      --c-field-line: rgba(220, 255, 240, .26); --c-warn: #ffcf70;
+      display: block; color: var(--c-text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", "Noto Sans TC", "PingFang TC", sans-serif;
+      font-size: 16px; line-height: 1.55; contain: layout style;
+    }
+    :host([data-theme="light"]) {
+      --c-text: #12352c; --c-muted: #3d6b5d; --c-faint: #5f8b7d;
+      --c-line: rgba(15, 110, 85, .18); --c-tile: rgba(225, 244, 235, .78);
+      --c-tile-2: rgba(210, 238, 226, .88); --c-accent: #0a7d5c; --c-accent-2: #176b86;
+      --c-field: rgba(255, 255, 255, .96); --c-field-2: #ffffff;
+      --c-field-line: rgba(15, 110, 85, .22); --c-warn: #9a5c00;
+    }
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    .card { position: relative; --pad: clamp(16px, 2.2vw, 24px); padding-top: var(--pad); container-type: inline-size; }
+    .panel {
+      position: relative; overflow: hidden; border-radius: 20px; padding: var(--pad);
+      border: 1px solid var(--c-line);
+      background:
+        radial-gradient(460px 280px at 100% -12%, rgba(255, 207, 112, .14), transparent 72%),
+        radial-gradient(420px 260px at 0% 108%, rgba(70, 200, 155, .14), transparent 74%),
+        linear-gradient(135deg, rgba(11, 58, 48, .62), rgba(7, 38, 34, .46) 55%, rgba(12, 62, 52, .56));
+      box-shadow: 0 20px 52px rgba(2, 20, 16, .34), inset 0 1px 0 rgba(190, 255, 228, .13);
+      backdrop-filter: blur(16px) saturate(150%); -webkit-backdrop-filter: blur(16px) saturate(150%);
+    }
+    :host([data-theme="light"]) .panel {
+      background:
+        radial-gradient(420px 260px at 100% -12%, rgba(190, 140, 40, .14), transparent 72%),
+        radial-gradient(420px 260px at 0% 108%, rgba(70, 190, 150, .16), transparent 74%),
+        linear-gradient(135deg, rgba(220, 244, 234, .80), rgba(238, 250, 244, .66) 55%, rgba(214, 240, 230, .78));
+      box-shadow: 0 18px 44px rgba(12, 70, 56, .12), inset 0 1px 0 rgba(255, 255, 255, .85);
+    }
+    .hd { position: relative; z-index: 1; padding: 0 var(--pad);
+      display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+    .hd h2 { margin: 0; font-size: clamp(18px, 2.4cqw, 22px); letter-spacing: .02em;
+      display: flex; align-items: center; flex-wrap: wrap; gap: 9px; }
+    .hd h2 .pip { width: 8px; height: 8px; border-radius: 50%; background: var(--c-warn);
+      box-shadow: 0 0 10px var(--c-warn); flex: none; }
+    .badge { flex: none; border: 1px solid var(--c-line); border-radius: 999px; padding: 4px 11px;
+      font-size: 12px; color: var(--c-warn); background: var(--c-tile); font-variant-numeric: tabular-nums; }
+    .tools { position: sticky; top: var(--sticky-top, 124px); z-index: 3;
+      display: flex; justify-content: center; margin-top: 16px; padding: 12px var(--pad) 10px; }
+    .tools.is-pinned {
+      background: linear-gradient(180deg, rgba(9, 45, 38, .97) 0%, rgba(9, 45, 38, .97) 84%, rgba(9, 45, 38, 0) 100%); }
+    :host([data-theme="light"]) .tools.is-pinned {
+      background: linear-gradient(180deg, rgba(233, 247, 240, .97) 0%, rgba(233, 247, 240, .97) 84%, rgba(233, 247, 240, 0) 100%); }
+    .toolwrap { width: 100%; max-width: 620px; }
+    .search { display: flex; align-items: center; gap: 10px; width: 100%;
+      padding: 11px 20px; border-radius: 999px; background: var(--c-field);
+      border: 1px solid var(--c-field-line);
+      box-shadow: 0 2px 10px rgba(2, 20, 16, .10), inset 0 1px 0 rgba(255, 255, 255, .10);
+      transition: background .18s, border-color .18s, box-shadow .18s; }
+    .search:hover { background: var(--c-field-2); }
+    .search:focus-within { background: var(--c-field-2); border-color: var(--c-accent);
+      box-shadow: 0 6px 24px rgba(2, 20, 16, .22); }
+    .search svg { width: 18px; height: 18px; flex: none; color: var(--c-faint); }
+    .search input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent;
+      color: var(--c-text); font: inherit; font-size: 15px; }
+    .search input::placeholder { color: var(--c-faint); }
+    .clr { flex: none; width: 24px; height: 24px; border: 0; border-radius: 50%; cursor: pointer;
+      background: var(--c-tile-2); color: var(--c-muted); font: inherit; font-size: 16px; line-height: 1; }
+    .clr:hover { color: var(--c-accent); }
+    .mode { display: flex; justify-content: center; gap: 8px; margin-top: 9px; }
+    .mb { border: 1px solid var(--c-line); border-radius: 999px; padding: 4px 13px; cursor: pointer;
+      background: var(--c-field); color: var(--c-muted); font: inherit; font-size: 12px; }
+    .mb:hover { border-color: var(--c-accent); }
+    .mb.on { border-color: var(--c-accent); background: var(--c-tile-2);
+      color: var(--c-accent); font-weight: 600; }
+    .result { position: relative; z-index: 1; margin: 14px 0 8px; font-size: 12.5px; color: var(--c-muted); }
+    .result:empty { display: none; }
+    .list { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; }
+    @container (max-width: 760px) { .list { grid-template-columns: minmax(0, 1fr); } }
+    .stop { display: flex; gap: 12px; min-width: 0; padding: 12px; border-radius: 14px;
+      background: var(--c-tile); border: 1px solid var(--c-line); }
+    .code { flex: none; width: 62px; text-align: center; padding: 7px 3px; border-radius: 11px;
+      background: var(--c-tile-2); }
+    .code b { display: block; font-size: 13px; letter-spacing: .01em; color: var(--c-accent);
+      overflow-wrap: anywhere; }
+    .code span { display: block; margin-top: 2px; font-size: 9.5px; color: var(--c-faint); }
+    .body { min-width: 0; flex: 1; }
+    .line { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+    .line h3 { margin: 0; font-size: 15px; font-weight: 650; flex: 1; min-width: 0;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .pole { flex: none; font-size: 10.5px; color: var(--c-warn); border: 1px solid currentColor;
+      border-radius: 999px; padding: 1px 7px; font-variant-numeric: tabular-nums; }
+    .alt { margin-top: 2px; font-size: 11.5px; color: var(--c-faint);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .meta { margin-top: 5px; font-size: 11px; color: var(--c-muted);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .meta b { color: var(--c-text); font-weight: 600; }
+    .routes { margin-top: 7px; display: flex; align-items: center; flex-wrap: wrap; gap: 5px; }
+    .rl { flex: none; font-size: 10.5px; color: var(--c-faint); margin-right: 2px; }
+    .rt, .pc { border: 1px solid var(--c-line); border-radius: 7px; padding: 2px 7px; cursor: pointer;
+      font: inherit; font-size: 11px; font-variant-numeric: tabular-nums; line-height: 1.4; }
+    .rt { background: var(--c-tile-2); color: var(--c-accent-2); }
+    .pc { background: transparent; color: var(--c-muted); }
+    .rt:hover, .pc:hover { border-color: var(--c-accent); color: var(--c-accent); }
+    .foot { margin-top: 8px; display: flex; justify-content: flex-end; align-items: center; gap: 8px; }
+    .links { flex: none; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px 9px; }
+    .links a { font-size: 11.5px; color: var(--c-accent-2); text-decoration: none; white-space: nowrap; }
+    .links a:hover { text-decoration: underline; }
+    .empty { grid-column: 1 / -1; padding: 26px 12px; text-align: center; color: var(--c-muted);
+      font-size: 13.5px; border: 1px dashed var(--c-line); border-radius: 14px; }
+    .actions { position: relative; z-index: 1; display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+    .more { padding: 8px 18px; border: 1px solid var(--c-line); border-radius: 999px;
+      background: var(--c-tile-2); color: var(--c-text); font: inherit; font-size: 13px; cursor: pointer; }
+    .more:hover { border-color: var(--c-accent); color: var(--c-accent); }
+    .srcs { position: relative; z-index: 1; margin-top: 18px; padding-top: 14px;
+      border-top: 1px solid var(--c-line); }
+    .srcs h3 { margin: 0 0 10px; font-size: 13px; font-weight: 650; color: var(--c-muted); }
+    /* 相關連結固定 3 欄：6 個連結在桌面與手機皆為 3 × 2 */
+    .src-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
+    .src-row { display: block; min-width: 0; padding: 9px 12px; border-radius: 12px; text-decoration: none;
+      background: var(--c-tile); border: 1px solid var(--c-line); color: var(--c-text); }
+    .src-row:hover { border-color: var(--c-accent); }
+    .src-name { display: block; font-size: 12.5px; font-weight: 600; color: var(--c-accent-2);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .src-desc { display: block; margin-top: 2px; font-size: 11px; color: var(--c-faint);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .credit { margin-top: 12px; font-size: 11px; color: var(--c-faint); }
+    @container (max-width: 760px) { .src-grid { gap: 7px; } }
+    @container (max-width: 460px) {
+      .src-grid { gap: 6px; }
+      .src-row { padding: 8px 6px; }
+      .src-name { font-size: 11.5px; white-space: normal; overflow: visible;
+        text-overflow: clip; overflow-wrap: anywhere; line-height: 1.35; }
+      .src-desc { font-size: 10px; white-space: normal; overflow: visible;
+        text-overflow: clip; overflow-wrap: anywhere; line-height: 1.3; }
+    }
+  `;
+
+  class MacauBusstopsWidget extends HTMLElement {
+    static get observedAttributes() { return ['theme', 'title', 'limit']; }
+
+    constructor() {
+      super();
+      this.attachShadow({ mode: 'open' });
+      this._qRaw = '';
+      this._q = '';
+      this._shelled = false;
+      this._showAll = false;
+      this._mode = 'site';
+      this._limit = 24;
+      this._cfg = null;
+      this._state = 'idle';
+      this._activated = false;
+      this._loading = false;
+      this._io = null;
+      this._err = '';
+      this._onTabClick = null;
+      this._justActivated = false;
+    }
+
+    get cfg() {
+      return {
+        theme: this.getAttribute('theme') === 'dark' ? 'dark' : 'light',
+        title: clean(this.getAttribute('title')) || '澳門巴士站｜全澳站牌查詢',
+        limit: clampInt(this.getAttribute('limit'), 6, 120, 24)
+      };
+    }
+
+    connectedCallback() {
+      if (this._shelled) return;
+      this._shelled = true;
+      this._cfg = this.cfg;
+      this.setAttribute('data-theme', this._cfg.theme);
+      this._limit = this._cfg.limit;
+      this._shell();
+      this._paint();
+      this._watch();
+    }
+
+    disconnectedCallback() {
+      if (this._onWinScroll) {
+        window.removeEventListener('scroll', this._onWinScroll);
+        window.removeEventListener('resize', this._onWinScroll);
+        this._onWinScroll = null;
+      }
+      if (this._io) { this._io.disconnect(); this._io = null; }
+      if (this._onTabClick) {
+        document.removeEventListener('click', this._onTabClick);
+        this._onTabClick = null;
+      }
+    }
+
+    attributeChangedCallback(name, oldVal, newVal) {
+      if (oldVal === newVal || !this._shelled) return;
+      this._cfg = this.cfg;
+      if (name === 'theme') {
+        this.setAttribute('data-theme', this._cfg.theme);
+      } else if (name === 'title') {
+        var t = this.shadowRoot.querySelector('[data-title]');
+        if (t) t.textContent = this._cfg.title;
+      } else if (name === 'limit') {
+        this._limit = this._cfg.limit;
+        this._paint();
+      }
+    }
+
+    /* 只有進入「巴士站」分類才連線；其餘分類與首次載入都不發資料請求 */
+    _isVisible() {
+      var panel = this.closest ? this.closest('[data-view-panel]') : null;
+      if (panel && panel.hasAttribute('hidden')) return false;
+      return this.offsetParent !== null ||
+        (this.getClientRects && this.getClientRects().length > 0);
+    }
+
+    _watch() {
+      var self = this;
+      function activate() {
+        if (self._activated) return;
+        self._activated = true;
+        self._justActivated = true;
+        if (self._io) { self._io.disconnect(); self._io = null; }
+        self.refresh();
+      }
+      if (this._isVisible()) {
+        activate();
+        self._justActivated = false;
+      } else if (window.IntersectionObserver) {
+        this._io = new IntersectionObserver(function (entries) {
+          for (var i = 0; i < entries.length; i++) {
+            if (entries[i].isIntersecting) { activate(); break; }
+          }
+        }, { threshold: 0.01 });
+        this._io.observe(this);
+      }
+      /* 每次進入「巴士站」分頁都重新核對官方版本；其餘分頁完全不連線 */
+      this._onTabClick = function (e) {
+        var t = e.target && e.target.closest
+          ? e.target.closest('.view-tab[data-view="bus"]') : null;
+        if (!t) return;
+        setTimeout(function () {
+          if (!self._activated) activate();
+          else if (!self._justActivated) self.refresh();
+          self._justActivated = false;
+        }, 0);
+      };
+      document.addEventListener('click', this._onTabClick);
+    }
+
+    _emitUpdate(detail) {
+      this.dispatchEvent(new CustomEvent('macau-bus:update', {
+        bubbles: true, composed: true, detail: detail
+      }));
+    }
+    _emitError(message) {
+      this.dispatchEvent(new CustomEvent('macau-bus:error', {
+        bubbles: true, composed: true, detail: { message: message }
+      }));
+    }
+
+    /* 只在巴士站分頁顯示時連線；重整先只抓約 0.6KB 官方目錄比對版本 */
+    refresh(force) {
+      var self = this;
+      if (!this._isVisible()) {
+        this._paint();
+        this._emitUpdate({ idle: true, count: STOPS.length, sites: SITES });
+        return;
+      }
+      this._activated = true;
+      if (this._loading) {
+        this._emitUpdate({ pending: true, count: STOPS.length, sites: SITES });
+        return;
+      }
+      this._loading = true;
+      this._state = 'loading';
+      this._paint();
+      loadOfficial(!!force).then(function (d) {
+        self._loading = false;
+        DATA = d;
+        applyData(d.stops);
+        self._state = d.stale ? 'stale' : 'ready';
+        self._err = d.reason || '';
+        self._paint();
+        self._emitUpdate({
+          count: STOPS.length, sites: SITES, version: d.version,
+          fromCache: d.fromCache, snapshot: false
+        });
+        if (d.stale) self._emitError(d.reason || '官方檔案暫時無法取得');
+      }).catch(function (err) {
+        self._loading = false;
+        self._state = 'error';
+        self._err = err && err.message ? err.message : String(err);
+        self._paint();
+        self._emitError(self._err);
+      });
+    }
+
+    _shell() {
+      this.shadowRoot.innerHTML = '<style>' + STYLE + '</style>' +
+        '<div class="card">' +
+          '<div class="hd"><h2><i class="pip"></i><span data-title></span></h2>' +
+          '<span class="badge" data-badge></span></div>' +
+          '<div class="tools"><div class="toolwrap"><label class="search">' + searchIcon() +
+            '<input type="search" data-search placeholder="搜尋站名／站號／站牌編號／路線（例：M11、亞馬喇前地、3A）" aria-label="搜尋澳門巴士站">' +
+            '<button class="clr" type="button" data-clear hidden aria-label="清除搜尋">×</button>' +
+            '</label>' +
+            '<div class="mode" data-mode>' +
+              '<button class="mb on" type="button" data-set-mode="site">依站點</button>' +
+              '<button class="mb" type="button" data-set-mode="pole">逐站牌</button>' +
+            '</div></div></div>' +
+          '<div class="panel">' +
+            '<div class="result" data-result></div>' +
+            '<div class="list" data-list></div>' +
+            '<div class="actions">' +
+              '<button class="more" type="button" data-more hidden></button>' +
+              '<button class="more" type="button" data-all hidden></button>' +
+            '</div>' +
+            '<div class="srcs" data-sources></div>' +
+          '</div>' +
+        '</div>';
+
+      var self = this;
+      this.shadowRoot.addEventListener('click', function (e) { self._onClick(e); });
+      this.shadowRoot.addEventListener('input', function (e) { self._onInput(e); });
+      this._tools = this.shadowRoot.querySelector('.tools');
+      if (this._tools && !this._onWinScroll) {
+        this._onWinScroll = function () { self._updatePin(); };
+        window.addEventListener('scroll', this._onWinScroll, { passive: true });
+        window.addEventListener('resize', this._onWinScroll);
+      }
+      var t = this.shadowRoot.querySelector('[data-title]');
+      if (t) t.textContent = this._cfg.title;
+      this._paintLinks();
+    }
+
+    _items() { return this._mode === 'pole' ? STOPS : GROUPS; }
+
+    _filtered() {
+      var q = this._q, all = this._items();
+      if (!q) return all;
+      var hit = [];
+      for (var i = 0; i < all.length; i++) {
+        var sc = score(all[i], q);
+        if (sc >= 0) hit.push({ s: all[i], sc: sc, k: i });
+      }
+      hit.sort(function (a, b) { return (a.sc - b.sc) || (a.k - b.k); });
+      return hit.map(function (x) { return x.s; });
+    }
+
+    _paint() {
+      this._paintModeCounts();
+      var badge = this.shadowRoot.querySelector('[data-badge]');
+      var ready = (this._state === 'ready' || this._state === 'stale') && STOPS.length;
+
+      if (badge) badge.textContent = ready
+        ? num(STOPS.length) + ' 個站牌 · ' + num(SITES) + ' 個站點'
+        : '官方即時資料';
+
+      if (!ready) { this._paintState(); return; }
+      this._paintList();
+      this._updatePin();
+    }
+
+    _paintState() {
+      var list = this.shadowRoot.querySelector('[data-list]');
+      var result = this.shadowRoot.querySelector('[data-result]');
+      var more = this.shadowRoot.querySelector('[data-more]');
+      var all = this.shadowRoot.querySelector('[data-all]');
+      var clr = this.shadowRoot.querySelector('[data-clear]');
+      var msg = {
+        idle: '切到「巴士站」分類時才會向官方取得資料；其餘頁面完全不連線。',
+        loading: '正在向澳門政府數據開放平台核對官方資料版本…',
+        error: '無法取得官方資料：' + this._err
+      }[this._state] || '';
+      if (result) result.textContent = msg;
+      if (list) {
+        list.innerHTML = '<div class="empty">' + (this._state === 'error'
+          ? '官方資料暫時無法載入。請重新載入本頁再試，或使用下方交通事務局的官方連結查詢。'
+          : this._state === 'loading'
+            ? '正在取得官方資料…首次載入需下載一次官方檔案，之後會由快取讀取。'
+            : '尚未載入官方資料。') + '</div>';
+      }
+      if (more) more.hidden = true;
+      if (all) all.hidden = true;
+      if (clr) clr.hidden = true;
+    }
+
+    _paintModeCounts() {
+      var box = this.shadowRoot.querySelector('[data-mode]');
+      if (!box) return;
+      var has = (this._state === 'ready' || this._state === 'stale') && STOPS.length;
+      var site = box.querySelector('[data-set-mode="site"]');
+      var pole = box.querySelector('[data-set-mode="pole"]');
+      if (site) site.textContent = '依站點' + (has ? ' ' + num(SITES) : '');
+      if (pole) pole.textContent = '逐站牌' + (has ? ' ' + num(STOPS.length) : '');
+    }
+
+    _paintList() {
+      var list = this.shadowRoot.querySelector('[data-list]');
+      var result = this.shadowRoot.querySelector('[data-result]');
+      var more = this.shadowRoot.querySelector('[data-more]');
+      var all = this.shadowRoot.querySelector('[data-all]');
+      var clr = this.shadowRoot.querySelector('[data-clear]');
+      var rows = this._filtered();
+      var total = rows.length;
+      var shown = this._showAll ? total : Math.min(this._limit, total);
+      var unit = this._mode === 'pole' ? '個站牌' : '個站點';
+      var overview = this._mode === 'pole'
+        ? '全澳共 ' + num(STOPS.length) + ' 個站牌（' + num(SITES) + ' 個站點）· 顯示 ' + num(shown)
+        : '全澳共 ' + num(SITES) + ' 個站點（' + num(STOPS.length) + ' 個站牌）· 顯示 ' + num(shown);
+
+      if (clr) clr.hidden = !this._qRaw;
+      if (list) {
+        var render = this._mode === 'pole' ? poleHtml : siteHtml;
+        list.innerHTML = total
+          ? rows.slice(0, shown).map(render).join('')
+          : '<div class="empty">找不到符合「' + esc(this._qRaw) + '」的巴士站，試試站名、站號（如 M11）或路線（如 3A）。</div>';
+      }
+      if (result) {
+        result.textContent = total
+          ? (this._qRaw ? '符合「' + this._qRaw + '」共 ' + num(total) + ' ' + unit + ' · 顯示 ' + num(shown)
+                       : overview)
+          : '沒有符合條件的巴士站';
+      }
+      if (more) {
+        more.hidden = this._showAll || shown >= total;
+        more.textContent = '顯示更多（尚有 ' + num(total - shown) + ' 個）';
+      }
+      if (all) {
+        all.hidden = this._showAll || shown >= total;
+        all.textContent = '一次顯示全部 ' + num(total) + ' 個';
+      }
+    }
+
+    _paintLinks() {
+      var box = this.shadowRoot.querySelector('[data-sources]');
+      if (!box) return;
+      box.innerHTML = '<h3>相關連結｜官方巴士資訊</h3><div class="src-grid">' +
+        LINKS.map(function (l) {
+          return '<a class="src-row" href="' + esc(l.href) + '" target="_blank" rel="noopener noreferrer"' +
+            ' title="' + esc(l.href) + '">' +
+            '<span class="src-name">' + esc(l.name) + ' ↗</span>' +
+            '<span class="src-desc">' + esc(l.desc) + '</span></a>';
+        }).join('') + '</div>' +
+        '<div class="credit">資料提供：' + esc(DATA.department || '交通事務局') +
+        '　·　本頁不內建站點資料</div>';
+    }
+
+    _setQuery(raw) {
+      this._qRaw = clean(raw);
+      this._q = this._qRaw.toLowerCase();
+      this._limit = this._cfg.limit;
+      this._showAll = false;
+      var input = this.shadowRoot.querySelector('[data-search]');
+      if (input) input.value = this._qRaw;
+      this._paintList();
+    }
+
+    _setMode(mode) {
+      this._mode = mode === 'pole' ? 'pole' : 'site';
+      this._limit = this._cfg.limit;
+      this._showAll = false;
+      var self = this;
+      var box = this.shadowRoot.querySelector('[data-mode]');
+      if (box) Array.prototype.forEach.call(box.querySelectorAll('[data-set-mode]'), function (b) {
+        b.classList.toggle('on', b.getAttribute('data-set-mode') === self._mode);
+      });
+      this._paintList();
+    }
+
+    _onClick(e) {
+      var t = e.target && e.target.closest
+        ? e.target.closest('[data-more],[data-all],[data-route],[data-query],[data-clear],[data-set-mode]')
+        : null;
+      if (!t) return;
+      if (t.hasAttribute('data-set-mode')) {
+        this._setMode(t.getAttribute('data-set-mode'));
+      } else if (t.hasAttribute('data-more')) {
+        this._limit += this._cfg.limit;
+        this._paintList();
+      } else if (t.hasAttribute('data-all')) {
+        this._showAll = true;
+        this._paintList();
+      } else if (t.hasAttribute('data-route')) {
+        this._setQuery(t.getAttribute('data-route'));
+      } else if (t.hasAttribute('data-query')) {
+        this._setQuery(t.getAttribute('data-query'));
+      } else if (t.hasAttribute('data-clear')) {
+        this._setQuery('');
+      }
+    }
+
+    _onInput(e) {
+      if (!e.target || !e.target.matches || !e.target.matches('[data-search]')) return;
+      this._qRaw = clean(e.target.value);
+      this._q = this._qRaw.toLowerCase();
+      this._limit = this._cfg.limit;
+      this._showAll = false;
+      this._paintList();
+    }
+
+    _updatePin() {
+      var t = this._tools;
+      if (!t) return;
+      var top = parseFloat(getComputedStyle(t).top) || 0;
+      var r = t.getBoundingClientRect();
+      t.classList.toggle('is-pinned', r.top <= top + 1 && r.bottom > 0);
+    }
+  }
+
+  window.customElements.define('macau-busstops-widget', MacauBusstopsWidget);
+})();
+</script>
+
+
+<script>
 (function () {
   'use strict';
 
@@ -5732,12 +6808,13 @@
   var acc = document.getElementById('arrivals-acc');
   var btn = document.getElementById('arrivals-btn');
   var panel = document.getElementById('arrivals-panel');
-  var widgets = document.querySelectorAll('macau-arrivals-widget, macau-departures-widget, macau-weather-widget, macau-warnings-widget, macau-street-history-widget, macau-tour-widget, macau-registry-widget');
+  var widgets = document.querySelectorAll('macau-arrivals-widget, macau-departures-widget, macau-weather-widget, macau-warnings-widget, macau-street-history-widget, macau-tour-widget, macau-registry-widget, macau-busstops-widget');
   /* 主題不記憶：每次載入一律淺色，深色僅能由按鈕手動切換。 */
 
   /* ---------- 自動重整：僅天氣預報與飛機起降每 5 分鐘一次 ----------
-     其餘分類（街道歷史、旅遊快訊、牌照場所）在 HTML 上標記 no-auto，
-     只在進入網頁時由各自的 connectedCallback 讀取一次；頁首重整按鈕仍可手動更新。
+     其餘分類（街道歷史、旅遊快訊、牌照場所、巴士站）在 HTML 上標記 no-auto。
+     巴士站更進一步：只有切到該分類才連線取得官方資料，且重整時只比對官方
+     目錄版本，版本不變就讀快取；頁首重整按鈕仍可手動更新。
      此處統一設定 refresh，讓需要定期更新的元件計時起點對齊。 */
   var AUTO_REFRESH_SEC = 300;
   var AUTO_WIDGETS = ['macau-arrivals-widget', 'macau-departures-widget',
@@ -5761,7 +6838,8 @@
     'macau-warnings:update', 'macau-warnings:error',
     'macau-street:update', 'macau-street:error',
     'macau-tour:update', 'macau-tour:error',
-    'macau-registry:update', 'macau-registry:error'
+    'macau-registry:update', 'macau-registry:error',
+    'macau-bus:update', 'macau-bus:error'
   ];
   var refreshing = false;
 
@@ -5834,11 +6912,23 @@
     if (t) t.setAttribute('aria-label', theme === 'light' ? '切換為深色模式' : '切換為淺色模式');
   }
 
-  /* 預設一律淺色：不跟隨系統深色偏好、不記憶上次選擇；
-     深色模式只能由使用者按下主題按鈕手動切換（重整頁面即回到淺色）。 */
-  applyTheme('light');
+  /* 預設主題跟隨系統的深色／淺色偏好（prefers-color-scheme）；
+     使用者按下主題按鈕後，本次瀏覽以手動選擇為準，系統偏好再變也不覆寫。 */
+  var themeLocked = false;
+  function systemTheme() {
+    return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
+      ? 'dark' : 'light';
+  }
+  applyTheme(systemTheme());
+  if (window.matchMedia) {
+    var mqTheme = window.matchMedia('(prefers-color-scheme: dark)');
+    var onSystemTheme = function () { if (!themeLocked) applyTheme(mqTheme.matches ? 'dark' : 'light'); };
+    if (mqTheme.addEventListener) mqTheme.addEventListener('change', onSystemTheme);
+    else if (mqTheme.addListener) mqTheme.addListener(onSystemTheme);
+  }
 
   document.getElementById('theme-toggle').addEventListener('click', function () {
+    themeLocked = true;
     var next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
     applyTheme(next);
   });
@@ -5877,7 +6967,7 @@
   /* ---------- 分類切換（預設只顯示「天氣預報」） ----------
      其餘分類的資料必須按下對應按鈕才會出現；切換時一併展開該分類的卡片，
      讓使用者按一次就能看到內容，不必再逐張點開。 */
-  var VIEWS = ['weather', 'flights', 'street', 'tour', 'registry'];
+  var VIEWS = ['weather', 'flights', 'street', 'tour', 'bus', 'registry'];
   var viewButtons = document.querySelectorAll('.view-tab');
   var viewPanels = document.querySelectorAll('[data-view-panel]');
 
@@ -5945,7 +7035,8 @@
   /* ---------- 小工具狀態（無障礙提示） ---------- */
   ['macau-arrivals:error', 'macau-departures:error',
    'macau-weather:error', 'macau-warnings:error',
-   'macau-street:error', 'macau-tour:error', 'macau-registry:error'].forEach(function (name) {
+   'macau-street:error', 'macau-tour:error', 'macau-registry:error',
+   'macau-bus:error'].forEach(function (name) {
     document.addEventListener(name, function (e) {
       if (window.console) console.warn('[' + name + '] 資料更新失敗：', e.detail && e.detail.message);
     });
