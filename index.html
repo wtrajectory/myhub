@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-Hant" data-theme="dark">
+<html lang="zh-Hant" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -13,10 +13,10 @@
     });
   })();
 </script>
-<meta name="color-scheme" content="dark light">
-<meta name="theme-color" content="#080e19">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#eef3fa">
 <title>Cleanhands HUB</title>
-<meta name="description" content="澳門國際機場抵澳與離澳航班、氣象觀測與天氣警告、市政署食品預警、街道歷史，以及旅遊局旅遊快訊活動資訊、市政署餐飲場所名單與旅遊局五類牌照場所資訊。">
+<meta name="description" content="澳門國際機場抵澳與離澳航班、氣象觀測與天氣警告、街道歷史，以及旅遊局旅遊快訊活動資訊、市政署餐飲場所名單與旅遊局五類牌照場所資訊。">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230f1c30'/%3E%3Ctext x='32' y='44' font-size='34' font-family='serif' fill='%234fd1bd' text-anchor='middle'%3EI%3C/text%3E%3C/svg%3E">
 <style>
   :root {
@@ -33,7 +33,6 @@
     --faint: #6b819f;
     --accent: #4fd1bd;
     --accent-2: #f4bd6a;
-    --food-accent: #f08080;
     --shadow: 0 24px 60px rgba(2, 8, 18, .55);
     --radius: 18px;
   }
@@ -50,7 +49,6 @@
     --faint: #7c90ad;
     --accent: #0f8c72;
     --accent-2: #a56809;
-    --food-accent: #b8443c;
     --shadow: 0 20px 48px rgba(21, 43, 74, .10);
   }
 
@@ -332,61 +330,6 @@
     border-color: rgba(15, 118, 92, .18);
   }
 
-  /* ---------------- 食品預警玻璃框（置於航班看板下方） ---------------- */
-  .food-glass {
-    position: relative;
-    isolation: isolate;
-    margin-top: clamp(18px, 2.4vw, 26px);
-    padding: clamp(14px, 1.9vw, 22px);
-    border-radius: 26px;
-    border: 1px solid rgba(240, 128, 128, .32);
-    background:
-      radial-gradient(620px 300px at 10% -16%, rgba(220, 72, 72, .22), transparent 72%),
-      radial-gradient(520px 300px at 96% 108%, rgba(150, 32, 40, .20), transparent 70%),
-      linear-gradient(135deg, rgba(78, 24, 30, .54), rgba(46, 16, 20, .42) 52%, rgba(78, 24, 30, .52));
-    box-shadow:
-      0 26px 64px rgba(28, 4, 8, .44),
-      inset 0 1px 0 rgba(255, 200, 200, .16),
-      inset 0 0 70px rgba(220, 72, 72, .10);
-    backdrop-filter: blur(20px) saturate(155%);
-    -webkit-backdrop-filter: blur(20px) saturate(155%);
-  }
-  .food-glass::before {
-    content: "";
-    position: absolute;
-    top: 0; left: 7%; right: 7%; height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255, 176, 176, .55), transparent);
-    pointer-events: none;
-  }
-  .food-glass > .acc { position: relative; z-index: 1; }
-  .food-glass .acc {
-    background: color-mix(in srgb, var(--surface) 88%, transparent);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border-color: rgba(240, 128, 128, .24);
-  }
-  .food-glass .acc.is-open { border-color: color-mix(in srgb, var(--food-accent) 48%, var(--border)); }
-  .acc-ico.food {
-    background: color-mix(in srgb, var(--food-accent) 15%, transparent);
-    color: var(--food-accent);
-    border-color: color-mix(in srgb, var(--food-accent) 28%, transparent);
-  }
-  html[data-theme="light"] .food-glass {
-    border-color: rgba(184, 68, 60, .26);
-    background:
-      radial-gradient(620px 300px at 10% -16%, rgba(232, 120, 112, .22), transparent 72%),
-      radial-gradient(520px 300px at 96% 108%, rgba(200, 90, 80, .14), transparent 70%),
-      linear-gradient(135deg, rgba(255, 242, 240, .84), rgba(253, 248, 247, .66) 52%, rgba(252, 236, 233, .80));
-    box-shadow:
-      0 22px 52px rgba(92, 24, 24, .14),
-      inset 0 1px 0 rgba(255, 255, 255, .82),
-      inset 0 0 70px rgba(184, 68, 60, .07);
-  }
-  html[data-theme="light"] .food-glass .acc {
-    background: color-mix(in srgb, var(--surface) 91%, transparent);
-    border-color: rgba(184, 68, 60, .20);
-  }
-
   /* ---------------- 雙欄看板 ---------------- */
   .boards {
     display: grid;
@@ -573,9 +516,6 @@
     .flight-glass { background: none; border-color: #999; box-shadow: none; padding: 0; backdrop-filter: none; }
     .flight-glass::before, .flight-glass::after { display: none; }
     .flight-glass .acc { background: #fff; }
-    .food-glass { background: none; border-color: #999; box-shadow: none; padding: 0; backdrop-filter: none; }
-    .food-glass::before { display: none; }
-    .food-glass .acc { background: #fff; }
     .acc-panel { grid-template-rows: 1fr !important; }
   }
 </style>
@@ -596,7 +536,7 @@
         <small>澳門時間</small>
       </span>
       <button class="refresh-btn" id="global-refresh" type="button"
-              aria-label="重新整理全部資訊" title="重新整理全部資訊（航班、天氣、天氣資訊、食品預警、街道歷史、旅遊快訊、餐飲場所、旅遊局牌照）">
+              aria-label="重新整理全部資訊" title="重新整理全部資訊（航班、天氣、天氣資訊、街道歷史、旅遊快訊、餐飲場所、旅遊局牌照）">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/>
           <path d="M21 3v5h-5"/>
@@ -620,15 +560,14 @@
   <button class="view-tab" type="button" data-view="registry" aria-pressed="false" aria-controls="view-registry"><img class="tab-ico" src="https://www.macaotourism.gov.mo/static/logo/mgto.svg" alt=""><img class="tab-ico" src="https://www.gov.mo/zh-hant/wp-content/uploads/sites/4/2021/01/IAM-logo_2019-_C03-300x300.png" alt="">牌照場所</button>
   <button class="view-tab" type="button" data-view="tour" aria-pressed="false" aria-controls="view-tour">旅遊快訊</button>
   <button class="view-tab" type="button" data-view="flights" aria-pressed="false" aria-controls="view-flights">飛機起降</button>
-  <button class="view-tab" type="button" data-view="food" aria-pressed="false" aria-controls="view-food">食品預警資訊</button>
   <button class="view-tab" type="button" data-view="street" aria-pressed="false" aria-controls="view-street">街道歷史</button>
 </nav>
 
 <main id="main" class="shell">
 
   <div class="top-row view-panel" id="view-weather" data-view-panel="weather">
-    <macau-weather-widget refresh="300" theme="dark" station="黑沙環"></macau-weather-widget>
-    <macau-warnings-widget refresh="300" theme="dark"></macau-warnings-widget>
+    <macau-weather-widget refresh="300" theme="light" station="黑沙環"></macau-weather-widget>
+    <macau-warnings-widget refresh="300" theme="light"></macau-warnings-widget>
   </div>
 
   <div class="flight-glass view-panel" id="view-flights" data-view-panel="flights" hidden>
@@ -657,7 +596,7 @@
     <div class="acc-panel" id="arrivals-panel" role="region" aria-labelledby="arrivals-btn">
       <div class="acc-panel-in">
         <div class="acc-body">
-          <macau-arrivals-widget limit="5" refresh="300" theme="dark" hide-footer></macau-arrivals-widget>
+          <macau-arrivals-widget limit="5" refresh="300" theme="light" hide-footer></macau-arrivals-widget>
           <p class="acc-note">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
               <circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>
@@ -692,7 +631,7 @@
     <div class="acc-panel" id="departures-panel" role="region" aria-labelledby="departures-btn">
       <div class="acc-panel-in">
         <div class="acc-body">
-          <macau-departures-widget limit="5" refresh="300" theme="dark" hide-footer></macau-departures-widget>
+          <macau-departures-widget limit="5" refresh="300" theme="light" hide-footer></macau-departures-widget>
           <p class="acc-note">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
               <circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>
@@ -707,49 +646,16 @@
   </div>
   </div>
 
-  <div class="food-glass view-panel" id="view-food" data-view-panel="food" hidden>
-  <section class="acc" id="foodalert-acc" aria-labelledby="foodalert-btn">
-    <h2 class="acc-head">
-      <button class="acc-btn" id="foodalert-btn" type="button" aria-expanded="false" aria-controls="foodalert-panel">
-        <span class="acc-ico food" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M10.3 3.9 2.2 18a2 2 0 0 0 1.7 3h16.2a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/>
-            <path d="M12 9v4M12 17h.01"/>
-          </svg>
-        </span>
-        <span class="acc-titles">
-          <span class="acc-title">澳門食品預警資訊</span>
-          <span class="acc-sub">市政署 · 政府數據開放平台 · 每 5 分鐘更新 · 點擊展開或收合</span>
-        </span>
-        <span class="acc-state"><i aria-hidden="true"></i>LIVE</span>
-        <span class="acc-chev" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="m6 9 6 6 6-6"/>
-          </svg>
-        </span>
-      </button>
-    </h2>
-
-    <div class="acc-panel" id="foodalert-panel" role="region" aria-labelledby="foodalert-btn">
-      <div class="acc-panel-in">
-        <div class="acc-body">
-          <macau-foodalert-widget limit="5" refresh="300" theme="dark"></macau-foodalert-widget>
-        </div>
-      </div>
-    </div>
-  </section>
-  </div>
-
   <div class="street-panel view-panel" id="view-street" data-view-panel="street" hidden>
-    <macau-street-history-widget refresh="300" theme="dark"></macau-street-history-widget>
+    <macau-street-history-widget refresh="300" theme="light" no-auto></macau-street-history-widget>
   </div>
 
   <div class="tour-panel view-panel" id="view-tour" data-view-panel="tour" hidden>
-    <macau-tour-widget refresh="300" theme="dark" limit="9"></macau-tour-widget>
+    <macau-tour-widget refresh="300" theme="light" limit="9" no-auto></macau-tour-widget>
   </div>
 
   <div class="registry-panel view-panel" id="view-registry" data-view-panel="registry" hidden>
-    <macau-registry-widget refresh="300" theme="dark"></macau-registry-widget>
+    <macau-registry-widget refresh="300" theme="light" no-auto></macau-registry-widget>
   </div>
 
 </main>
@@ -949,13 +855,6 @@
       --maw-upcoming: #a56809;
       --maw-warn: #b8443c;
     }
-    @media (prefers-color-scheme: light) {
-      :host([data-theme="auto"]) {
-        --maw-bg: #f5f8fd; --maw-surface: #ffffff; --maw-surface-2: #f0f4fa;
-        --maw-border: #dce5f1; --maw-text: #16233a; --maw-muted: #53688a;
-        --maw-faint: #7c90ad; --maw-landed: #0f8c72; --maw-upcoming: #a56809; --maw-warn: #b8443c;
-      }
-    }
     *, *::before, *::after { box-sizing: border-box; }
     .wrap {
       background: var(--maw-bg); border: 1px solid var(--maw-border);
@@ -1051,7 +950,7 @@
         proxy: a('proxy') || '',
         limit: clamp(a('limit'), 1, 10, 5),
         refresh: clamp(a('refresh'), 15, 3600, 60),
-        theme: a('theme') || 'dark',
+        theme: a('theme') || 'light',
         title: a('title') || '澳門國際機場 · 抵澳航班',
         compact: this.hasAttribute('compact'),
         hideFooter: this.hasAttribute('hide-footer')
@@ -1426,13 +1325,6 @@
       --maw-upcoming: #a56809;
       --maw-warn: #b8443c;
     }
-    @media (prefers-color-scheme: light) {
-      :host([data-theme="auto"]) {
-        --maw-bg: #f5f8fd; --maw-surface: #ffffff; --maw-surface-2: #f0f4fa;
-        --maw-border: #dce5f1; --maw-text: #16233a; --maw-muted: #53688a;
-        --maw-faint: #7c90ad; --maw-landed: #0f8c72; --maw-upcoming: #a56809; --maw-warn: #b8443c;
-      }
-    }
     *, *::before, *::after { box-sizing: border-box; }
     .wrap {
       background: var(--maw-bg); border: 1px solid var(--maw-border);
@@ -1528,7 +1420,7 @@
         proxy: a('proxy') || '',
         limit: clamp(a('limit'), 1, 10, 5),
         refresh: clamp(a('refresh'), 15, 3600, 60),
-        theme: a('theme') || 'dark',
+        theme: a('theme') || 'light',
         title: a('title') || '澳門國際機場 · 離澳航班',
         compact: this.hasAttribute('compact'),
         hideFooter: this.hasAttribute('hide-footer')
@@ -2359,7 +2251,7 @@
       var a = function (n) { return this.getAttribute(n); }.bind(this);
       return {
         refresh: clamp(a('refresh'), 60, 3600, 600),
-        theme: a('theme') || 'dark',
+        theme: a('theme') || 'light',
         title: a('title') || '澳門天氣預報'
       };
     }
@@ -2689,11 +2581,15 @@
  *   直連失敗時依序退回 r.jina.ai 文字代理（讀 xml.smg.gov.mo）、原站直連。
  *
  * 排列方式（單一卡片、分區由上方至下方）：
- *   1 現時生效狀態（天氣警告提醒框）
+ *   1 現時生效狀態（天氣警告提醒框）— 僅有生效警告時出現
  *   2 信號詳情（點擊提醒框才出現，再點擊收起；含官方發佈內容）
- *   3 各類警告信號（6 欄 × 1 列、生效亮燈）
+ *   3 各類警告信號（6 欄 × 1 列、生效亮燈）— 僅有生效警告時出現
  *   4 即時特別天氣訊息（有訊息才出現）
- *   5 暴雨・水浸・雨勢（生效時才顯示信號／水浸實況，雨勢恆顯示）
+ *   5 暴雨・水浸・雨勢／天氣概況（恆顯示；有暴雨警告才列出信號與水浸實況）
+ *
+ * 無生效警告時，1／3 連同「0 天氣警告」計數徽章、卡片標題與副標題一併隱藏，
+ * 整卡維持中性樣式；六類信號資料全數無法取得時，仍保留「狀態未知」提示與標題。
+ * 天氣概況標題右側不加「參考」字樣；桌面兩卡不等高（右卡依內容收合）。
  *
  * 互動：僅當至少一項警告信號生效（亮燈）時，狀態提醒框可點擊／鍵盤操作；
  *   點擊後於其下方展開所有生效信號的資訊與官方「發佈內容」，再次點擊收起。
@@ -2701,8 +2597,8 @@
  * 詳情時間欄位：發出時間＝SignalChangedAt（信號發出／改變時間，缺值時用 IssuedAt）；
  *   更新時間＝IssuedAt（最近一次更新）；SysPubdate（GMT+8 系統發佈時間）不顯示。
  *
- * 警告計數（頁首徽章＋狀態框＋整卡外框常駐）：
- *   0 項生效 → 顯示「0 天氣警告」，綠框；N 項生效 → 顯示「N 天氣警告」，紅框。
+ * 警告計數（頁首徽章＋狀態框＋整卡外框，僅有生效警告時出現）：
+ *   N 項生效 → 顯示「N 天氣警告」，紅框；0 項生效 → 整組隱藏。
  *   計數以六類警告信號（含暴雨信號）為準；即時特別天氣訊息屬「提示」，
  *   另列於第 2 區並以琥珀色標示，不計入警告數量。
  *   資料全部無法取得時顯示「狀態未知」中性框，不誤報為 0 項。
@@ -3130,7 +3026,7 @@
       --c-danger: #ff9585;
       --c-info: #8fd8e8;
       display: block;
-      height: 100%;
+      /* 桌面兩卡不等高：右卡依內容收合，不再被 grid 列高撐滿 */
       color: var(--c-text);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", "Noto Sans TC", "PingFang TC", sans-serif;
       font-size: 16px;
@@ -3171,7 +3067,7 @@
         linear-gradient(135deg, rgba(220, 244, 234, .78), rgba(238, 250, 244, .62) 55%, rgba(214, 240, 230, .74));
       box-shadow: 0 18px 44px rgba(12, 70, 56, .12), inset 0 1px 0 rgba(255, 255, 255, .8);
     }
-    /* 警告狀態框：0 項生效時綠框、有生效警告時紅框（整卡外框同步變色） */
+    /* 整卡外框：有生效警告時紅框；無警告時中性框（is-clear 樣式保留供日後還原） */
     .card.is-clear { border-color: rgba(99, 224, 176, .52); }
     .card.has-alert { border-color: rgba(255, 120, 100, .62); }
     .card.is-unknown-card { border-color: rgba(255, 207, 112, .48); }
@@ -3186,6 +3082,7 @@
       background: linear-gradient(90deg, transparent, rgba(20, 130, 95, .28), transparent);
     }
     .hd { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; flex-wrap: wrap; position: relative; z-index: 1; }
+    .hd[hidden] { display: none; }
     .hd h2 { margin: 0; font-size: 19px; font-weight: 700; letter-spacing: .02em; display: flex; align-items: center; gap: 9px; }
     .hd h2 .pip { width: 9px; height: 9px; border-radius: 3px; background: #ffc46b; box-shadow: 0 0 0 4px rgba(255, 196, 107, .16); }
     /* 淺色底：琥珀色指示點改深一階；has-alert 的紅色指示點不受影響 */
@@ -3209,7 +3106,7 @@
     .badge.tip { color: var(--c-warn); border-color: rgba(255, 207, 112, .45); background: rgba(255, 207, 112, .12); box-shadow: 0 0 12px rgba(255, 207, 112, .22); }
     .badge.on { color: var(--c-danger); border-color: rgba(255, 149, 133, .48); background: rgba(255, 149, 133, .13); box-shadow: 0 0 13px rgba(255, 149, 133, .28); }
     .badge.on.lv2 { color: var(--c-warn); border-color: rgba(255, 207, 112, .45); background: rgba(255, 207, 112, .12); }
-    /* 常駐計數徽章：0 天氣警告＝綠框、N 天氣警告＝紅框 */
+    /* 計數徽章：N 天氣警告＝紅框；無生效警告時徽章整組隱藏（zero 樣式保留） */
     .badge.zero {
       color: var(--c-ok); border: 1.5px solid rgba(99, 224, 176, .62);
       background: rgba(99, 224, 176, .12);
@@ -3269,7 +3166,7 @@
     .state.lv3 .emblem { color: var(--c-danger); background: rgba(255, 149, 133, .14); border-color: rgba(255, 149, 133, .36); }
     .state.lv1 b, .state.lv2 b { color: var(--c-warn); }
     .state.lv3 b, .state.lv3 span { color: var(--c-danger); }
-    /* 狀態框常駐：無生效警告時綠框顯示「0 天氣警告」，有警告時紅框顯示項數 */
+    /* 狀態框：僅有生效警告時顯示紅框與項數；無警告時整框隱藏（is-clear 樣式保留） */
     .state.is-clear {
       border: 1.5px solid rgba(99, 224, 176, .60);
       background: rgba(99, 224, 176, .09);
@@ -3518,7 +3415,7 @@
       var a = function (n) { return this.getAttribute(n); }.bind(this);
       return {
         refresh: clamp(a('refresh'), 60, 3600, 300),
-        theme: a('theme') || 'dark',
+        theme: a('theme') || 'light',
         title: a('title') || '澳門天氣資訊'
       };
     }
@@ -3559,7 +3456,7 @@
         '  <div data-notice></div>' +
         '  <div class="state" data-state></div>' +
         '  <div class="detail" id="warnings-detail" data-detail hidden></div>' +
-        '  <div class="sec"><div class="sec-hd">各類警告信號</div>' +
+        '  <div class="sec" data-signals hidden><div class="sec-hd">各類警告信號</div>' +
         '    <ul class="list" data-list></ul></div>' +
         '  <div class="sec cyclone" data-cyclone hidden></div>' +
         '  <div class="sec special" data-special hidden></div>' +
@@ -3788,17 +3685,27 @@
       var specials = liveSpecial.length ? liveSpecial : (d.special || []);
       var unknownAll = list.every(function (x) { return x.unknown; });
 
+      var hasAlerts = active.length > 0;
+      /* 無生效警告時隱藏警告狀態與各類信號；資料全數失敗仍保留「狀態未知」提示 */
+      var showWarnState = hasAlerts || unknownAll;
       var card = this.shadowRoot.querySelector('.card');
       if (card) {
-        /* 0 項生效＝綠框；有警告＝紅框；琥珀 pip 另表示有即時特別天氣訊息 */
-        card.className = 'card ' + (unknownAll ? 'is-unknown-card' : (active.length ? 'has-alert'
-          : 'is-clear' + (liveSpecial.length ? ' has-tip' : '')));
+        /* 有警告＝紅框；無警告＝中性框（不再顯示「0 天氣警告」綠框）；琥珀 pip 表示特別提示 */
+        var cardCls = 'card';
+        if (unknownAll) cardCls += ' is-unknown-card';
+        else if (hasAlerts) cardCls += ' has-alert';
+        else if (liveSpecial.length) cardCls += ' has-tip';
+        card.className = cardCls;
       }
 
-      /* --- 常駐警告計數徽章：綠框 0 項／紅框 N 項 --- */
+      /* --- 卡片標題／副標題：與警告區同步，僅有生效警告（或狀態未知）時出現 --- */
+      var hdEl = this.shadowRoot.querySelector('.hd');
+      if (hdEl) hdEl.hidden = !showWarnState;
+
+      /* --- 警告計數徽章：僅有生效警告（或狀態未知）時出現 --- */
       var badge = this.shadowRoot.querySelector('[data-badge]');
       if (badge) {
-        badge.hidden = false;
+        badge.hidden = !showWarnState;
         if (unknownAll) {
           badge.className = 'badge';
           badge.textContent = '狀態未知';
@@ -3811,10 +3718,10 @@
         }
       }
 
-      /* --- 1. 現時生效狀態框：以綠／紅框呈現警告數量 --- */
+      /* --- 1. 現時生效狀態框：僅有生效警告（或狀態未知）時出現 --- */
       var state = this.shadowRoot.querySelector('[data-state]');
       if (state) {
-        state.hidden = false;
+        state.hidden = !showWarnState;
         if (unknownAll) {
           state.className = 'state is-unknown';
           state.innerHTML = '<div class="emblem">' + emblem(0) + '</div>' +
@@ -3866,7 +3773,9 @@
         }
       }
 
-      /* --- 3. 六類信號 6 × 1 --- */
+      /* --- 3. 六類信號 6 × 1：僅有生效警告時才顯示整個分區 --- */
+      var sigSec = this.shadowRoot.querySelector('[data-signals]');
+      if (sigSec) sigSec.hidden = !hasAlerts;
       this.shadowRoot.querySelector('[data-list]').innerHTML = list.map(function (x) {
         var cls = 'sig' + (x.active ? ' is-on lv' + x.level : '') + (x.unknown ? ' is-unknown' : '');
         /* 未生效格只留名稱，不顯示「未生效」字樣；生效格才顯示等級／狀態 */
@@ -3921,8 +3830,9 @@
 
       var hd = this.shadowRoot.querySelector('[data-rain-hd]');
       if (hd) {
+        /* 無生效警告時標題右側留空（原「參考」字樣已移除）；生效時仍顯示「生效中」 */
         hd.innerHTML = (hasWarn ? '暴雨警告・水浸・雨勢' : '天氣概況') +
-          '<span class="count" data-rain-count>' + (hasWarn ? '生效中' : '參考') + '</span>';
+          (hasWarn ? '<span class="count" data-rain-count>生效中</span>' : '');
       }
 
       var rows = [];
@@ -3944,644 +3854,6 @@
   }
 
   if (window.customElements) window.customElements.define('macau-warnings-widget', MacauWarningsWidget);
-})();
-
-</script>
-<script>
-/* 澳門食品預警 · 官方資料檔繁體欄位快照
-   來源：https://api.data.gov.mo/document/download/b2290058-1cc9-4933-9bae-15af56552e5d
-   抓取時間（澳門）：2026-11-08T17:16:34+08:00
-   用途：官方平台暫時無法連線、或瀏覽器不支援 ZIP 解壓時，仍可顯示最近的預警資訊。
-   此檔由資料集下載結果自動產生，非即時資料；元件會優先向官方 API 更新。
-*/
-window.MACAU_FOODALERT_SNAPSHOT = {"capturedAt":"2026-11-08T17:16:34+08:00","latestPubDate":"2026-08-30","source":"澳門政府數據開放平台／市政署「食品預警」官方資料檔 foodalert.json（僅保留繁體欄位）","items":[{"no":"016/DSA/2026","pubDate":"2026-08-30T00:00:00","titleZh":"有關「台灣地區新東陽牌新東陽新竹米粉檢出甲醛」之事宜","foodProductsZh":"\u003cdiv>\u003cdiv>產品名稱:新東陽新竹米粉\u003c/div>\u003cdiv>品牌:新東陽\u003c/div>\u003cdiv>來源地:台灣地區\u003c/div>\u003cdiv>淨重:300克\u003c/div>\u003cdiv>香港分銷商:B&S Company\u003c/div>\u003cp>\u003cbr>\u003c/p>\u003c/div>","durabilityIndicationZh":"\u003cdiv>\u003cp>​此日期前最佳:二○二九年四月十日\u003cbr>\u003c/p>\u003c/div>","sourceZh":"\u003cdiv>\u003cp>​\u003c/p>\u003cp>\u003c/p>\u003cdiv>香港食物安全中心\u003cbr>\u003ca href=\"https://www.cfs.gov.hk/tc_chi/press/20260829_12583.html\">https://www.cfs.gov.hk/tc_chi/press/20260829_12583.html​\u003c/a>\u003c/div>\u003cp>\u003cbr>\u003cbr>\u003c/p>\u003c/div>","reasonsZh":"\u003cdiv>\u003cp>​根據香港食物安全中心發出的新聞公報，上述樣本檢測結果顯示含百萬分之十二的甲醛，該中心指示香港分銷商將受影響批次產品即時停售、下架和展開回收。\u003cbr>\u003c/p>\u003c/div>","adviceZh":"\u003cdiv>\u003cp>\u003cbr>\u003c/p>\u003cdiv>1. 請採取所需行動，以確保出售的所有食品適宜供人食用。\u003c/div>\u003cdiv>\u003cbr>\u003c/div>\u003cdiv>2. 不要出售或使用上述食品。\u003c/div>\u003cdiv>\u003cbr>\u003c/div>\u003cdiv>3. 請瀏覽食品安全資訊網https://www.iam.gov.mo/foodsafety ，以便取得最新資訊 。\u003c/div>\u003cdiv>\u003cbr>\u003c/div>\u003cdiv>4. 如有任何查詢，請致電28338181與食品安全廳聯絡。​\u003cbr>\u003c/div>\u003cp>\u003cbr>\u003c/p>\u003c/div>","alertPDFZh":"https://www.iam.gov.mo/ShowFile.ashx?p=foodsafetyinfo/List54/417_0ba7d36cdd36fd76d62fbfbadf952420.pdf","photo":""},{"no":"015/DSA/2026","pubDate":"2026-08-12T00:00:00","titleZh":"有關「Olitalia牌瓶裝橄欖油產品可能含有礦物油」之事宜","foodProductsZh":"\u003cdiv>\u003cp>品牌: Olitalia\u003c/p>\u003cp>產品名稱:\u003c/p>\u003cp>(1) Olitalia Pomace Olive Oil 1L\u003c/p>\u003cp>(2) Olitalia Pomace Olive Oil 5L\u003c/p>\u003cp>香港分銷商: 義生洋行有限公司\u003c/p>\u003cp>包裝地: 意大利\u003cbr>\u003c/p>\u003c/div>","durabilityIndicationZh":"\u003cdiv>\u003cp>​批次: 所有批次\u003cbr>\u003c/p>\u003c/div>","sourceZh":"\u003cdiv>\u003cp>​香港食物安全中心Hong Kong CFS\u003c/p>\u003cp>\u003ca href=\"https://www.cfs.gov.hk/tc_chi/press/20260811_12557.html\">https://www.cfs.gov.hk/tc_chi/press/20260811_12557.html\u003c/a>\u003cbr>\u003c/p>\u003c/div>","reasonsZh":"\u003cdiv>\u003cp>​根據香港食物安全中心發出的新聞公報，上述產品可能含有礦物油（即芳香族碳氫化合物），香港分銷商正回收有關產品。\u003cbr>\u003c/p>\u003c/div>","adviceZh":"\u003cdiv>\u003cp>1. 請採取所需行動，以確保出售的所有食品適宜供人食用。\u003c/p>\u003cp>2. 不要出售或使用上述食品。\u003c/p>\u003cp>3. 請瀏覽食品安全資訊網https://www.iam.gov.mo/foodsafety ，以便取得最新資訊 。\u003c/p>\u003cp>4. 如有任何查詢，請致電28338181與食品安全廳聯絡。\u003cbr>\u003c/p>\u003c/div>","alertPDFZh":"https://www.iam.gov.mo/ShowFile.ashx?p=foodsafetyinfo/List54/416_e5d7aa0603222b708f96b2282b6bd62d.pdf","photo":""},{"no":"014/DSA/2026","pubDate":"2026-08-05T00:00:00","titleZh":"有關「BONNE MAMAN牌士多啤梨果醬可能含有異物」之事宜","foodProductsZh":"\u003cdiv>\u003cp>\u003c/p>\u003cdiv>品牌:BONNE MAMA\u003c/div>\u003cdiv>\u003cbr>\u003c/div>\u003cdiv>產品名稱:CONFITURES de fraises en mini pots verre de 30 g(strawberry jam in 30g glass jars)\u003c/div>\u003cdiv>\u003cbr>\u003c/div>\u003cdiv>產品條碼:3045320070361\u003cbr>\u003c/div>\u003cp>\u003cbr>\u003cbr>\u003c/p>\u003c/div>","durabilityIndicationZh":"\u003cdiv>\u003cp>\u003c/p>\u003cdiv>批次:K154, K155\u003cbr>\u003c/div>\u003cdiv>\u003cbr>\u003c/div>\u003cdiv>最短保質期:30/06/2028\u003cbr>\u003c/div>\u003cp>\u003cbr>\u003c/p>\u003c/div>","sourceZh":"\u003cdiv>\u003cp>​\u003cbr>\u003c/p>\u003cp>\u003c/p>\u003cdiv>香港食物安全中心\u003c/div>\u003cdiv>\u003cbr>\u003c/div>\u003cdiv>\u003ca href=\"https://www.cfs.gov.hk/english/rc/subject/files/20260804_1.pdf\">https://www.cfs.gov.hk/english/rc/subject/files/20260804_1.pdf\u003c/a>\u003c/div>\u003cdiv>\u003cbr>\u003c/div>\u003cdiv>法國Rappel Conso\u003c/div>\u003cdiv>\u003cbr>\u003c/div>\u003cdiv>\u003ca href=\"https://rappel.conso.gouv.fr/fiche-rappel/23072/Interne\">https://rappel.conso.gouv.fr/fiche-rappel/23072/Interne\u003c/a>\u003cbr>\u003c/div>\u003cp>\u003cbr>\u003cbr>\u003c/p>\u003c/div>","reasonsZh":"\u003cdiv>\u003cp>​香港食物安全中心和法國Rappel Conso公佈，上述產品可能含有玻璃異物，正進行回收。\u003cbr>\u003c/p>\u003c/div>","adviceZh":"\u003cdiv>\u003cp>​\u003c/p>\u003cdiv>\u003ctable border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">\u003ctbody>\u003ctr>\u003ctd valign=\"top\">\u003cdiv>\u003cdiv>\u003cdiv>\u003cp>1. 請採取所需行動，以確保出售的所有食品適宜供人食用。\u003c/p>\u003cp>2. 不要出售或使用上述食品。\u003c/p>\u003cp>3. 請瀏覽食品安全資訊網https://www.iam.gov.mo/foodsafety ，以便取得最新資訊 。\u003c/p>\u003cp>4. 如有任何查詢，請致電28338181與食品安全廳聯絡。​\u003cbr>\u003c/p>\u003c/div>\u003c/div>\u003c/div>\u003c/td>\u003c/tr>\u003c/tbody>\u003c/table>\u003c/div>\u003cp>\u003cbr>\u003c/p>\u003c/div>","alertPDFZh":"https://www.iam.gov.mo/ShowFile.ashx?p=foodsafetyinfo/List54/415_b2072a58cf1792f4240e95f47a64c18f.pdf","photo":"https://www.iam.gov.mo/ShowFile.ashx?p=foodsafetyinfo/List54/415_99dc9e511821154a16b511e508188e2b.jpg"},{"no":"013/DSA/2026","pubDate":"2026-07-25T00:00:00","titleZh":"有關「皇家美素力®1號嬰兒配方奶粉樣本鉛含量超出本澳食安標準」之事宜","foodProductsZh":"\u003cdiv>\u003cp>​\u003c/p>\u003cdiv>產品名稱:皇家美素力®1號\u003c/div>\u003cdiv>淨含量:800克\u003c/div>\u003cdiv>有效日期:30/09/2027\u003cbr>\u003c/div>\u003cp>\u003cbr>\u003c/p>\u003c/div>","durabilityIndicationZh":"\u003cdiv>\u003cp>​批號:1W07KPJ\u003cbr>\u003c/p>\u003c/div>","sourceZh":"\u003cdiv>\u003cp>​\u003cspan>澳門藥物監督管理局\u003c/span>\u003cspan> \u003c/span>\u003cbr>\u003c/p>\u003c/div>","reasonsZh":"\u003cdiv>\u003cp>​根據澳門藥物監督管理局的通報，上述批次產品檢出鉛含量超出本澳第23/2018號行政法規《食品中重金屬污染物最高限量》的規定。\u003cbr>\u003c/p>\u003c/div>","adviceZh":"\u003cdiv>\u003cp>​\u003c/p>\u003cp>1. 請採取所需行動，以確保出售的所有食品適宜供人食用。\u003c/p>\u003cp>2. 不要出售或使用上述食品。\u003c/p>\u003cp>3. 請瀏覽食品安全資訊網https://www.iam.gov.mo/foodsafety ，以便取得最新資訊 。\u003c/p>\u003cp>4. 如有任何查詢，請致電28338181與食品安全廳聯絡。\u003cbr>\u003c/p>\u003cp>\u003cbr>\u003c/p>\u003c/div>","alertPDFZh":"https://www.iam.gov.mo/ShowFile.ashx?p=foodsafetyinfo/List54/414_bd5e051c00a3732f25894ccbc57c84e3.pdf","photo":""},{"no":"012/DSA/2026","pubDate":"2026-07-16T00:00:00","titleZh":"有關「兩個香料樣本檢出環氧乙烷」之事宜","foodProductsZh":"\u003cdiv>\u003cp>產品名稱: Crushed Red Pepper\u003c/p>\u003cp>品牌: Spice Hunter\u003c/p>\u003cp>來源地: 美國\u003c/p>\u003cp>淨重: 36克\u003c/p>\u003cp>香港經銷商: V-Care Asia Ltd.\u003cbr>\u003c/p>\u003cp>\u003c/p>\u003cp>\u003cbr>\u003c/p>\u003cp>產品名稱: Organic Oregano\u003c/p>\u003cp>品牌: Barnes\u003c/p>\u003cp>來源地: India\u003c/p>\u003cp>淨重: 24克\u003c/p>\u003cp>香港經銷商: Co Op Buy Ltd.\u003cbr>\u003c/p>\u003c/div>","durabilityIndicationZh":"\u003cdiv>\u003cp>​產品名稱: Crushed Red Pepper\u003c/p>\u003cp>此日期前最佳: 二○二七年十一月十五日\u003cbr>\u003c/p>\u003cp>\u003cbr>\u003c/p>\u003cp>\u003c/p>\u003cp>產品名稱: Organic Oregano\u003cbr>\u003c/p>\u003cp>此日期前最佳: 二○二七年六月十五日​\u003c/p>\u003c/div>","sourceZh":"\u003cdiv>\u003cp>香港食物安全中心\u003c/p>\u003cp>\u003ca href=\"https://www.cfs.gov.hk/tc_chi/press/20260715_12501.html\">https://www.cfs.gov.hk/tc_chi/press/20260715_12501.html\u003c/a>\u003cbr>\u003c/p>\u003cp>\u003cbr>\u003c/p>\u003c/div>","reasonsZh":"\u003cdiv>\u003cspan>根據香港食物安全中心發出的新聞公報，上述兩個樣本檢測結果顯示含環氧乙烷，該中心指令將受影響產品停售及下架。\u003c/span>\u003cbr>\u003c/div>","adviceZh":"\u003cdiv>\u003cp>1. 請採取所需行動，以確保出售的所有食品適宜供人食用。\u003c/p>\u003cp>2. 不要出售或使用上述食品。\u003c/p>\u003cp>3. 請瀏覽食品安全資訊網https://www.iam.gov.mo/foodsafety ，以便取得最新資訊 。\u003c/p>\u003cp>4. 如有任何查詢，請致電28338181與食品安全廳聯絡。\u003cbr>\u003c/p>\u003c/div>","alertPDFZh":"https://www.iam.gov.mo/ShowFile.ashx?p=foodsafetyinfo/List54/413_c90ec7a67e15b8627b7a2840391ac367.pdf","photo":""},{"no":"011/DSA/2026","pubDate":"2026-07-09T00:00:00","titleZh":"有關「韓國Yopokki牌年糕產品可能存有食用風險」之事宜","foodProductsZh":"\u003cdiv>\u003cp>​\u003c/p>\u003cp>產品名稱: Yopokki Ricecake Cup Cheese flavour\u003c/p>\u003cp>規格: 120g\u003c/p>\u003cp> \u003c/p>\u003cp>產品名稱: Yopokki Ricecake Cup Sweet & Spicy flavour\u003c/p>\u003cp>規格: 140g\u003c/p>\u003cp> \u003cbr>\u003c/p>\u003cp>產品名稱: Yopokki Ricecake Cup Jjajang\u003c/p>\u003cp>規格: 120g\u003cbr>\u003c/p>\u003cp> \u003c/p>\u003cp>產品名稱: Yopokki Ricecake Cup Red Bean\u003c/p>\u003cp>規格: 120g\u003cbr>\u003c/p>\u003cp> \u003c/p>\u003cp>產品名稱: Yopokki Ricecake Cup Kimchi flavour\u003c/p>\u003cp>規格: 115g\u003c/p>\u003cp> \u003cbr>\u003c/p>\u003cp>產品名稱: Yopokki Ricecake Cup Carbonara flavour\u003c/p>\u003cp>規格: 120g\u003c/p>\u003cp> \u003cbr>\u003c/p>\u003cp>產品名稱: KR Yopokki Ricecake & Ramen Cup Kimchi flavour\u003c/p>\u003cp>規格: 145g\u003cbr>\u003c/p>\u003cp> \u003c/p>\u003cp>產品名稱: KR Yopokki Ricecake & Ramen Cup Hot and Spicy flavour\u003c/p>\u003cp>規格: 145g\u003c/p>\u003cp> \u003cbr>\u003c/p>\u003cp>產品名稱: KR Yopokki Ricecake & Ramen Cup Sweet and Spicy flavour\u003c/p>\u003cp>規格: 145g\u003cbr>\u003c/p>\u003cp> \u003c/p>\u003cp>產品名稱: KR Yopokki Ricecake & Ramen Cup Curry flavour\u003c/p>\u003cp>規格: 145g\u003cbr>\u003cbr>\u003c/p>\u003c/div>","durabilityIndicationZh":"\u003cdiv>\u003cp>​\u003c/p>\u003cp>產品名稱: Yopokki Ricecake Cup Cheese flavour\u003c/p>\u003cp>此日期前最佳: 18/12/2026\u003c/p>\u003cp> \u003c/p>\u003cp>產品名稱: Yopokki Ricecake Cup Sweet & Spicy flavour\u003c/p>\u003cp>此日期前最佳: 16/12/2026\u003c/p>\u003cp> \u003c/p>\u003cp>產品名稱: Yopokki Ricecake Cup Jjajang\u003c/p>\u003cp>此日期前最佳: 13/01/2027\u003c/p>\u003cp> \u003c/p>\u003cp>產品名稱: Yopokki Ricecake Cup Red Bean\u003c/p>\u003cp>此日期前最佳: 13/01/2027\u003c/p>\u003cp> \u003c/p>\u003cp>產品名稱: Yopokki Ricecake Cup Kimchi flavour\u003c/p>\u003cp>此日期前最佳: 13/12/2026\u003c/p>\u003cp> \u003c/p>\u003cp>產品名稱: Yopokki Ricecake Cup Carbonara flavour\u003c/p>\u003cp>此日期前最佳: 18/12/2026\u003c/p>\u003cp> \u003c/p>\u003cp>產品名稱: KR Yopokki Ricecake & Ramen Cup Kimchi flavour\u003cbr>\u003c/p>\u003cp>此日期前最佳: 13/01/2027\u003c/p>\u003cp> \u003c/p>\u003cp>產品名稱: KR Yopokki Ricecake & Ramen Cup Hot and Spicy flavour\u003c/p>\u003cp>此日期前最佳: 13/01/2027\u003c/p>\u003cp> \u003c/p>\u003cp>產品名稱: KR Yopokki Ricecake & Ramen Cup Sweet and Spicy flavour\u003c/p>\u003cp>此日期前最佳: 13/01/2027\u003c/p>\u003cp> \u003c/p>\u003cp>產品名稱: KR Yopokki Ricecake & Ramen Cup Curry flavour\u003cbr>\u003c/p>\u003cp>此日期前最佳: 13/12/2026\u003cbr>\u003c/p>\u003c/div>","sourceZh":"\u003cdiv>\u003cdiv>愛爾蘭食品安全局\u003cbr>\u003c/div>\u003cdiv>\u003cbr>\u003c/div>\u003cdiv>\u003ca href=\"https://www.fsai.ie/news-and-alerts/food-alerts/recall-of-specific-batches-of-various-yopokki-rice\">https://www.fsai.ie/news-and-alerts/food-alerts/recall-of-specific-batches-of-various-yopokki-rice\u003c/a>\u003cbr>\u003c/div>\u003c/div>","reasonsZh":"\u003cdiv>\u003cp>​根據愛爾蘭食品安全局的回收訊息，上述產品可能有腐敗變質風險，正進行回收。​\u003cbr>\u003c/p>\u003c/div>","adviceZh":"\u003cdiv>\u003cdiv>\u003ctable border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">\u003ctbody>\u003ctr>\u003ctd valign=\"top\">\u003cdiv>\u003cdiv>\u003cdiv>\u003cp>​1. 請採取所需行動，以確保出售的所有食品適宜供人食用。\u003c/p>\u003cp>2. 不要出售或使用上述食品。\u003cbr>\u003c/p>\u003cp>3. 請瀏覽食品安全資訊網https://www.iam.gov.mo/foodsafety ，以便取得最新資訊 。\u003c/p>\u003cp>4. 如有任何查詢，請致電28338181與食品安全廳聯絡。​\u003cbr>\u003c/p>\u003c/div>\u003c/div>\u003c/div>\u003c/td>\u003c/tr>\u003c/tbody>\u003c/table>\u003c/div>\u003cp>\u003cbr>\u003c/p>\u003c/div>","alertPDFZh":"https://www.iam.gov.mo/ShowFile.ashx?p=foodsafetyinfo/List54/412_aa0e660e8997c597e321ff0a3a9643bf.pdf","photo":"https://www.iam.gov.mo/ShowFile.ashx?p=foodsafetyinfo/List54/412_03d2af9763f3f29500c8e054af4137d8.jpg"},{"no":"010/DSA/2026","pubDate":"2026-06-22T00:00:00","titleZh":"有關「日本日清牌即食麵產品可能含有異物」之事宜","foodProductsZh":"\u003cdiv>\u003cp>​\u003c/p>\u003cdiv>產品名稱:日清ソース焼そばカップ チキンスープ付き\u003c/div>\u003cdiv>內容量:104g（めん90g）\u003c/div>\u003cdiv>產品條碼:4902105255797\u003c/div>\u003cdiv>日本製造所:東日本明星株式会社 埼玉工場（製造所固有記号：R)\u003cbr>\u003c/div>\u003cp>\u003cbr>\u003c/p>\u003c/div>","durabilityIndicationZh":"\u003cdiv>\u003cp>​賞味期限:2026年9月10日\u003cbr>\u003c/p>\u003c/div>","sourceZh":"\u003cdiv>\u003cp>​\u003c/p>\u003cp>日本消費者廳 \u003cbr>\u003c/p>\u003cp>\u003ca href=\"https://www.recall.caa.go.jp/result/detail.php?rcl=00000035441&screenkbn=01\">https://www.recall.caa.go.jp/result/detail.php?rcl=00000035441&screenkbn=01\u003c/a>\u003cbr>\u003c/p>\u003cp>\u003cbr>\u003c/p>\u003c/div>","reasonsZh":"\u003cdiv>\u003cp>​根據日本消費者廳發出的回收訊息，上述批次產品可能含有塑膠片，正進行回收。\u003cbr>\u003c/p>\u003c/div>","adviceZh":"\u003cdiv>\u003cp>​\u003c/p>\u003cp>1. 請採取所需行動，以確保出售的所有食品適宜供人食用。\u003c/p>\u003cp>2. 不要出售或使用上述食品。\u003cbr>\u003c/p>\u003cp>3. 請瀏覽食品安全資訊網https://www.iam.gov.mo/foodsafety ，以便取得最新資訊 。\u003c/p>\u003cp>4. 如有任何查詢，請致電28338181與食品安全廳聯絡。​\u003cbr>\u003c/p>\u003cp>\u003cbr>\u003c/p>\u003c/div>","alertPDFZh":"https://www.iam.gov.mo/ShowFile.ashx?p=foodsafetyinfo/List54/411_5aac91f0f32fe3b8ab8db2fef7ef98c1.pdf","photo":"https://www.iam.gov.mo/ShowFile.ashx?p=foodsafetyinfo/List54/411_99dc9e511821154a16b511e508188e2b.jpg"},{"no":"008/DSA/2026","pubDate":"2026-05-29T00:00:00","titleZh":"有關「兩瓶瓶裝礦泉水檢出腸球菌」之事宜","foodProductsZh":"\u003cdiv>\u003cp>​\u003c/p>\u003cdiv>\u003cp>1\u003c/p>\u003cp>產品名稱:Still Scottish Mountain Water\u003c/p>\u003cp>品牌:Marks & Spencer\u003c/p>\u003cp>容量:750毫升\u003c/p>\u003cp>香港經銷商:ALF Retail Hong Kong Limited\u003c/p>\u003cp> \u003c/p>\u003cp>2\u003c/p>\u003cp>產品名稱:LOTTE ICIS Natural Mineral Water 8.0\u003c/p>\u003cp>品牌:樂天\u003c/p>\u003cp>容量:2公升\u003c/p>\u003cp>香港經銷商:Goldtop Century Ltd\u003cbr>\u003c/p>\u003cbr>\u003cbr>\u003c/div>\u003cp>\u003cbr>\u003c/p>\u003c/div>","durabilityIndicationZh":"\u003cdiv>\u003cp>\u003cbr>\u003c/p>\u003cp>​1\u003c/p>\u003cp>此日期前最佳:二○二六年十二月\u003c/p>\u003cp>2\u003c/p>\u003cp>此日期前最佳:二○二七年九月二十二日\u003cbr>\u003c/p>\u003cp>\u003cbr>\u003c/p>\u003cp>\u003cbr>\u003c/p>\u003c/div>","sourceZh":"\u003cdiv>\u003cp>​\u003c/p>\u003cdiv>\u003cp>香港食物安全中心\u003c/p>\u003cp> \u003c/p>\u003cp>\u003ca href=\"https://www.cfs.gov.hk/tc_chi/press/20260528_12417.html\">https://www.cfs.gov.hk/tc_chi/press/20260528_12417.html\u003c/a>\u003cbr>\u003c/p>\u003cbr>\u003c/div>\u003cp>\u003cbr>\u003c/p>\u003c/div>","reasonsZh":"\u003cdiv>\u003cp>​根據香港食物安全中心發出的新聞公報，上述兩個樣本檢出在二百五十毫升內含一個腸球菌（腸道鏈球菌）菌落形成單位，根據香港《食品微生物含量指引》，在瓶裝天然礦泉水中不得檢出腸道鏈球菌，正進行回收。\u003cbr>\u003c/p>\u003c/div>","adviceZh":"\u003cdiv>\u003cp>​\u003c/p>\u003cp>1. 請採取所需行動，以確保出售的所有食品適宜供人食用。\u003c/p>\u003cp>2. 不要出售或使用上述食品。\u003cbr>\u003c/p>\u003cp>3. 請瀏覽食品安全資訊網https://www.iam.gov.mo/foodsafety ，以便取得最新資訊 。\u003c/p>\u003cp>4. 如有任何查詢，請致電28338181與食品安全廳聯絡。​\u003cbr>\u003c/p>\u003cp>\u003cbr>\u003c/p>\u003c/div>","alertPDFZh":"https://www.iam.gov.mo/ShowFile.ashx?p=foodsafetyinfo/List54/409_a7b70a4af75121a5d5d7e6cf058f995f.pdf","photo":""},{"no":"007/DSA/2026","pubDate":"2026-05-21T00:00:00","titleZh":"有關「樓上牌預包裝乾百合樣本鎘含量超出香港法例標準」之事宜","foodProductsZh":"\u003cdiv>\u003cp>​\u003c/p>\u003cdiv>產品名稱:百合\u003c/div>\u003cdiv>品牌:樓上\u003c/div>\u003cdiv>淨重量:303克\u003c/div>\u003cdiv>來源地:中國\u003c/div>\u003cdiv>\u003cbr>\u003cbr>\u003c/div>\u003cp>\u003cbr>\u003c/p>\u003c/div>","durabilityIndicationZh":"\u003cdiv>\u003cp>​此日期前最佳:二○二六年十一月三十日\u003cbr>\u003c/p>\u003c/div>","sourceZh":"\u003cdiv>\u003cp>​\u003c/p>\u003cdiv>香港食物安全中心\u003c/div>\u003cdiv>https://www.cfs.gov.hk/tc_chi/unsat_samples/20260520_12398.html\u003cbr>\u003c/div>\u003cp>\u003cbr>\u003c/p>\u003c/div>","reasonsZh":"\u003cdiv>\u003cp>​香港食物安全中心公布，經考慮乾製食物的因素後，樣本的鎘含量為百萬分之零點五三，超出香港法例標準。\u003cbr>\u003c/p>\u003c/div>","adviceZh":"\u003cdiv>\u003cp>​\u003c/p>\u003cp>1. 請採取所需行動，以確保出售的所有食品適宜供人食用。\u003c/p>\u003cp>2. 不要出售或使用上述食品。\u003cbr>\u003c/p>\u003cp>3. 請瀏覽食品安全資訊網https://www.iam.gov.mo/foodsafety ，以便取得最新資訊 。\u003c/p>\u003cp>4. 如有任何查詢，請致電28338181與食品安全廳聯絡。​\u003cbr>\u003c/p>\u003cp>\u003cbr>\u003c/p>\u003c/div>","alertPDFZh":"https://www.iam.gov.mo/ShowFile.ashx?p=foodsafetyinfo/List54/408_0f6b92eef4f497aa3547a711842b03c1.pdf","photo":""},{"no":"006/DSA/2026","pubDate":"2026-05-19T00:00:00","titleZh":"有關「泰國林真香牌豬肉鬆條二丁基羥基甲苯含量超出香港法例標準」之事宜","foodProductsZh":"\u003cdiv>\u003cp>\u003c/p>\u003cdiv>產品名稱:豬肉鬆條\u003c/div>\u003cdiv>品牌:林真香\u003c/div>\u003cdiv>淨重量:100克\u003c/div>\u003cdiv>來源地:泰國\u003cbr>\u003c/div>\u003c/div>","durabilityIndicationZh":"\u003cdiv>\u003cp>​此日期前最佳:2026年7月1日\u003cbr>\u003c/p>\u003c/div>","sourceZh":"\u003cdiv>\u003cp>​\u003c/p>\u003cp>香港食物安全中心\u003cbr>\u003c/p>\u003cp>\u003ca href=\"https://www.cfs.gov.hk/tc_chi/unsat_samples/20260518_12396.html\">https://www.cfs.gov.hk/tc_chi/unsat_samples/20260518_12396.html\u003c/a>\u003cbr>\u003c/p>\u003cp>\u003cbr>\u003c/p>\u003c/div>","reasonsZh":"\u003cdiv>\u003cp>​香港食物安全中心公布，上述樣本的二丁基羥基甲苯（經丁化作用的羥基甲苯）含量為每公斤三百三十毫克，超出香港法例標準。\u003cbr>\u003c/p>\u003c/div>","adviceZh":"\u003cdiv>\u003cp>​\u003c/p>\u003cp>1. 請採取所需行動，以確保出售的所有食品適宜供人食用。\u003c/p>\u003cp>2. 不要出售或使用上述食品。\u003cbr>\u003c/p>\u003cp>3. 請瀏覽食品安全資訊網https://www.iam.gov.mo/foodsafety ，以便取得最新資訊 。\u003c/p>\u003cp>4. 如有任何查詢，請致電28338181與食品安全廳聯絡。\u003cbr>\u003c/p>\u003cp>\u003cbr>\u003c/p>\u003c/div>","alertPDFZh":"https://www.iam.gov.mo/ShowFile.ashx?p=foodsafetyinfo/List54/407_94368a72cf383da2313986700c04cb03.pdf","photo":""},{"no":"005/DSA/2026","pubDate":"2026-04-15T00:00:00","titleZh":"有關「情熱価格牌金針菇產品可能含有異物」之事宜","foodProductsZh":"\u003cdiv>\u003cspan>\u003cp>\u003cbr>\u003c/p>\u003cp>\u003cspan>​產品名稱\u003cspan>:\u003c/span> \u003cspan>☆ありえ値ぇ情熱価格超特大なめ茸\u003c/span>\u003cbr>\u003c/span>\u003c/p>\u003cp>\u003cspan>規格\u003cspan>:\u003c/span> 瓶詰め\u003cspan>840g\u003c/span>\u003cbr>\u003c/span>\u003c/p>\u003cp>\u003cspan>\u003cspan>\u003cspan>產品條碼\u003c/span>\u003cspan>: \u003cspan>4549777402793\u003c/span>\u003c/span>\u003cbr>\u003c/span>\u003c/span>\u003c/p>\u003cp>\u003cspan>\u003cspan>\u003cspan>\u003cspan>\u003cspan>輸入國家:\u003c/span>\u003cspan> 中國\u003c/span>\u003cbr>\u003c/span>\u003c/span>\u003c/span>\u003c/span>\u003c/p>\u003cp>\u003cbr>\u003c/p>\u003c/span>\u003c/div>","durabilityIndicationZh":"\u003cdiv>\u003cp>​\u003cbr>\u003c/p>\u003cp>\u003cspan>\u003cspan>\u003cspan>\u003cspan>\u003cspan>\u003cspan>賞味期限\u003c/span>\u003cspan>:​\u003c/span>\u003cspan> \u003c/span>\u003cspan>2026.7.30\u003c/span>\u003cspan>、\u003c/span>\u003cspan>2026.9.22\u003c/span>\u003cspan>、\u003c/span>\u003cspan>2026.9.23\u003c/span>\u003cspan>、\u003c/span>\u003cspan>2026.9.24\u003c/span>\u003cspan>、\u003c/span>\u003cspan>2026.9.25\u003c/span>\u003cspan>、\u003c/span>\u003cspan>2026.10.9\u003c/span>\u003cspan>、\u003c/span>\u003cspan>2026.12.05\u003c/span>\u003cspan>、\u003c/span>\u003cspan>2026.12.07\u003c/span>\u003cspan>、\u003c/span>\u003cspan>2026.12.08\u003c/span>\u003cbr>\u003c/span>\u003c/span>\u003c/span>\u003c/span>\u003c/span>\u003c/p>\u003cdiv>\u003cspan>\u003cspan>\u003cspan>\u003cspan>\u003cspan>\u003cspan>\u003cbr>\u003c/span>\u003c/span>\u003c/span>\u003c/span>\u003c/span>\u003c/span>\u003c/div>\u003cp>\u003cbr>\u003c/p>\u003c/div>","sourceZh":"\u003cdiv>\u003cspan>\u003cp>\u003c/p>\u003cp>\u003cspan>\u003cbr>\u003c/span>\u003c/p>\u003cp>\u003cspan>日本消費者廳 \u003c/span>\u003c/p>\u003cspan>\n\n\u003c/span>\u003cspan>\u003ca href=\"https://www.recall.caa.go.jp/result/detail.php?rcl=00000035153&screenkbn=01\" target=\"_blank\">\u003cspan>https://www.recall.caa.go.jp/result/detail.php?rcl=00000035153&screenkbn=01\u003c/span>\u003c/a>\u003c/span>\u003cp>​\u003cbr>\u003c/p>\u003cp>\u003cbr>\u003c/p>\u003c/span>\u003c/div>","reasonsZh":"\u003cdiv>\u003cp>\u003c/p>\u003cp>\u003cspan>\u003cspan>\u003cspan>\u003cbr>\u003c/span>\u003c/span>\u003c/span>\u003c/p>\u003cp>\u003cspan>\u003cspan>根據日本消費者廳發出的回收訊息，\u003cspan>上述批次產品可能含有玻璃碎片，正進行回收。\u003c/span>​\u003c/span>\u003c/span>\u003c/p>\n\n\u003cp>\u003cbr>\u003c/p>\u003c/div>","adviceZh":"\u003cdiv>\u003cp>​\u003cbr>\u003c/p>\u003cp>1. 請採取所需行動，以確保出售的所有食品適宜供人食用。\u003c/p>\u003cp>2. 不要出售或使用上述食品。\u003cbr>\u003c/p>\u003cp>3. 請瀏覽食品安全資訊網https://www.iam.gov.mo/foodsafety ，以便取得最新資訊 。\u003c/p>\u003cp>4. 如有任何查詢，請致電28338181與食品安全廳聯絡。\u003cbr>\u003c/p>\u003cp>\u003cbr>\u003c/p>\u003c/div>","alertPDFZh":"https://www.iam.gov.mo/ShowFile.ashx?p=foodsafetyinfo/List54/406_61dd43cc3ac537f288dc26d166212368.pdf","photo":"https://www.iam.gov.mo/ShowFile.ashx?p=foodsafetyinfo/List54/406_96a3be3cf272e017046d1b2674a52bd3.jpg,https://www.iam.gov.mo/ShowFile.ashx?p=foodsafetyinfo/List54/406_a2ef406e2c2351e0b9e80029c909242d.jpg,https://www.iam.gov.mo/ShowFile.ashx?p=foodsafetyinfo/List54/406_e45ee7ce7e88149af8dd32b27f9512ce.jpg"},{"no":"004/DSA/2026","pubDate":"2026-03-27T00:00:00","titleZh":"有關「新西蘭Homegrown牌瓶裝蘋果汁飲品樣本展青霉素含量超出香港法例標準」之事宜","foodProductsZh":"\u003cdiv>\u003cp>​\u003c/p>\u003cp>\u003cspan>產品名稱: 100% PURE NZ APPLE JUICE\u003c/span>\u003c/p>\u003cp>\u003cspan>品牌: Homegrown\u003c/span>\u003c/p>\u003cp>\u003cspan>容量: 每瓶一公升\u003c/span>\u003c/p>\u003cp>\u003cspan>來源地: 新西蘭\u003cbr>\u003c/span>\u003c/p>\u003cp>\u003cspan>\u003cspan>香港進口商: 牛奶有限公司​\u003c/span>\u003cbr>\u003c/span>\u003c/p>\u003cp>\u003cbr>\u003c/p>\u003c/div>","durabilityIndicationZh":"\u003cdiv>\u003cp>\u003cspan>​此日期前最佳: 二○二六年五月十四日\u003c/span>\u003cbr>\u003c/p>\u003c/div>","sourceZh":"\u003cdiv>\u003cp>\u003cspan>​\u003cspan>香港食物安全中心\u003c/span>\u003c/span>\u003c/p>\u003cp>\u003cspan>\u003ca href=\"https://www.cfs.gov.hk/tc_chi/press/20260326_12299.html\">\u003cspan>https://www.cfs.gov.hk/tc_chi/press/20260326_12299.html\u003c/span>\u003c/a>\u003cbr>\u003c/span>\u003c/p>\u003c/div>","reasonsZh":"\u003cdiv>\u003cp>\u003cspan>\u003cspan>​\u003c/span>\u003cspan>香港食物安全中心公布，上述樣本每公斤含七十八微克的展青霉素（棒曲霉素），超出香港法例規定的每公斤食物含五十微克，正進行回收。\u003c/span>\u003cbr>\u003c/span>\u003c/p>\u003c/div>","adviceZh":"\u003cdiv>\u003cp>​\u003c/p>\u003cp>\u003cspan>1. 請採取所需行動，以確保出售的所有食品適宜供人食用。\u003c/span>\u003c/p>\u003cp>\u003cspan>2. 不要出售或使用上述食品。\u003cbr>\u003c/span>\u003c/p>\u003cp>\u003cspan>3. 請瀏覽食品安全資訊網https://www.iam.gov.mo/foodsafety ，以便取得最新資訊 。\u003c/span>\u003c/p>\u003cp>\u003cspan>4. 如有任何查詢，請致電28338181與食品安全廳聯絡。\u003cbr>\u003c/span>\u003c/p>\u003cp>\u003cbr>\u003c/p>\u003c/div>","alertPDFZh":"https://www.iam.gov.mo/ShowFile.ashx?p=foodsafetyinfo/List54/405_8264a0042de6eb2f2660f09ee83d1b25.pdf","photo":""},{"no":"003/DSA/2026","pubDate":"2026-03-06T00:00:00","titleZh":"有關「UCC牌咖啡飲料可能存有食用風險」之事宜","foodProductsZh":"\u003cdiv>\u003cp>\u003c/p>\u003cp>產品名稱: UCC BEANS&ROASTERS カフェラテ\u003c/p>\u003cp>規格:リキャップ缶375g\u003c/p>\u003cp>產品條碼: 49 01201 11958 3\u003c/p>\u003cp>賞味期限: 2027年1月\u003c/p>\u003cp>\u003cbr>\u003c/p>\u003cp>\u003cspan>\u003cspan>\u003cbr>\u003c/span>\u003c/span>\u003c/p>\u003c/div>","durabilityIndicationZh":"\u003cdiv>\u003cp>​\u003c/p>\u003cp>批次編號:\u003c/p>\u003cp>（上行）2027.01\u003c/p>\u003cp>（下行）CD ●●：●●\u003c/p>\u003cp>上述●●：●●為製造時間，回收對象的製造時間為10:24～10:45\u003cbr>\u003c/p>\u003cp>\u003cbr>\u003c/p>\u003c/div>","sourceZh":"\u003cdiv>\u003cp>​\u003c/p>\u003cp>日本消費者廳 \u003cbr>\u003c/p>\u003cp>\u003ca href=\"https://www.recall.caa.go.jp/result/detail.php?rcl=00000035018&screenkbn=01\">https://www.recall.caa.go.jp/result/detail.php?rcl=00000035018&screenkbn=01\u003c/a>\u003cbr>\u003c/p>\u003cp>\u003cbr>\u003c/p>\u003c/div>","reasonsZh":"\u003cdiv>\u003cp>​根據日本消費者廳發出的回收訊息，由於部份產品未充分殺菌，可能存有食用風險，正進行回收。\u003cbr>\u003c/p>\u003c/div>","adviceZh":"\u003cdiv>\u003cspan>\u003cp>​\u003c/p>\u003cp>1. 請採取所需行動，以確保出售的所有食品適宜供人食用。\u003c/p>\u003cp>2. 不要出售或使用上述食品。\u003cbr>\u003c/p>\u003cp>3. 請瀏覽食品安全資訊網https://www.iam.gov.mo/foodsafety ，以便取得最新資訊 。\u003c/p>\u003cp>\u003cspan>4. 如有任何查詢，請致電28338181與食品安全廳聯絡。 \u003cbr>\u003c/span>\u003c/p>\u003cp>\u003cspan>\u003cbr>\u003c/span>\u003c/p>\u003c/span>\u003c/div>","alertPDFZh":"https://www.iam.gov.mo/ShowFile.ashx?p=foodsafetyinfo/List54/404_de5e9cb2dc44a75e5a451f653ad51798.pdf","photo":"https://www.iam.gov.mo/ShowFile.ashx?p=foodsafetyinfo/List54/404_96a3be3cf272e017046d1b2674a52bd3.jpg,https://www.iam.gov.mo/ShowFile.ashx?p=foodsafetyinfo/List54/404_a2ef406e2c2351e0b9e80029c909242d.jpg"},{"no":"002/DSA/2026","pubDate":"2026-02-26T00:00:00","titleZh":"有關「紫菜產品可能含有異物」之事宜","foodProductsZh":"\u003cdiv>\u003cp>\u003cspan>\u003c/span>​產品名稱: \u003cspan>Pinkfong Seasoned Seaweed\nFlakes\u003c/span>\u003cbr>\u003c/p>\u003cp>規格: \u003cspan>40g\u003c/span>\u003cbr>\u003c/p>\u003c/div>","durabilityIndicationZh":"\u003cdiv>\u003cp>\u003cspan>\u003cspan>食用期限:​ \u003c/span>2026.08.20\u003c/span>\u003cbr>\u003c/p>\u003c/div>","sourceZh":"\u003cdiv>\u003cp>澳紐食品標準局​\u003cbr>\u003c/p>\u003cp>\u003ca href=\"https://clicktime.symantec.com/15x87uinBpbFqw9GUk7hN?h=EH8IBHuJSZ9-ObfH8dw03Cqeb2jX6i5gHV1187G6nhI=&u=https://www.foodstandards.gov.au/food-recalls/recall-alert/kagro-nsw-pty-ltd-pinkfong-seasoned-seaweed-flakes-40g\">https://www.foodstandards.gov.au/food-recalls/recall-alert/kagro-nsw-pty-ltd-pinkfong-seasoned-seaweed-flakes-40g\u003c/a>\u003cbr>\u003c/p>\u003cp>\u003cbr>\u003c/p>\u003c/div>","reasonsZh":"\u003cdiv>\u003cp>​根據澳紐食品標準局公布的回收訊息，上述產品可能含有塑膠異物，正進行回收。\u003cbr>\u003c/p>\u003c/div>","adviceZh":"\u003cdiv>\u003cp>\u003cspan>1. 請採取所需行動，以確保出售的所有食品適宜供人食用。\u003c/span>\u003c/p>\u003cp>\u003cspan>2. 不要出售或使用上述食品。\u003c/span>\u003c/p>\u003cp>\u003cspan>3. 請瀏覽食品安全資訊網https://www.iam.gov.mo/foodsafety​，以便取得最新資訊 。\u003c/span>\u003c/p>\u003cp>\u003cspan>4. 如有任何查詢，請致電28338181與食品安全廳聯絡。​\u003c/span>\u003c/p>\u003c/div>","alertPDFZh":"https://www.iam.gov.mo/ShowFile.ashx?p=foodsafetyinfo/List54/403_5d36bd0c7bfb1701557700691ee643fb.pdf","photo":"https://www.iam.gov.mo/ShowFile.ashx?p=foodsafetyinfo/List54/403_54e9afd8ee95eee14e15e7915691440c.jpg"},{"no":"001/DSA/2026","pubDate":"2026-01-07T00:00:00","titleZh":"有關「雀巢能恩和惠氏營養品嬰幼兒配方奶粉可能受蠟樣芽孢桿菌污染」之事宜","foodProductsZh":"\u003cdiv>\u003cp>​\u003cspan>見上。\u003c/span>\u003cbr>\u003c/p>\u003c/div>","durabilityIndicationZh":"\u003cdiv>\u003cp>​\u003cspan>見上。\u003c/span>\u003cbr>\u003c/p>\u003c/div>","sourceZh":"\u003cdiv>\u003cp>​香港食物安全中心\u003c/p>\u003cp>\u003ca href=\"https://www.cfs.gov.hk/tc_chi/press/20260106_12094.html\">https://www.cfs.gov.hk/tc_chi/press/20260106_12094.html\u003c/a> \u003c/p>\u003cp>\u003cbr>\u003cbr>\u003c/p>\u003c/div>","reasonsZh":"\u003cdiv>\u003cp>​\u003cspan>香港食物安全中心公布\u003c/span>\u003cspan>，\u003c/span>\u003cspan>由於上述產品個別原材料可能存在源自微生物蠟樣芽孢桿菌的物質\u003c/span>\u003cspan>（\u003c/span>\u003cspan>Cereulide\u003c/span>\u003cspan>），\u003c/span>\u003cspan>雀巢香港自願將受影響產品停售和下架\u003c/span>\u003cspan>，\u003c/span>\u003cspan>並展開預防性的回收。\u003c/span>\u003c/p>\u003cp>\u003cbr>\u003c/p>\u003cp>\u003cbr>\u003c/p>\u003c/div>","adviceZh":"\u003cdiv>\u003cp>​\u003c/p>\u003cdiv>\u003ctable border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">\u003ctbody>\u003ctr>\u003ctd valign=\"top\">\u003cdiv>\u003cdiv>\u003cdiv>\u003cp>\u003cspan>1. 請採取所需行動，以確保出售的所有食品適宜供人食用。\u003c/span>\u003c/p>\u003cp>\u003cspan>2. 不要出售或使用上述食品。\u003c/span>\u003c/p>\u003cp>\u003cspan>3. 請瀏覽食品安全資訊網https://www.iam.gov.mo/foodsafety​，以便取得最新資訊 。\u003c/span>\u003c/p>\u003cp>\u003cspan>4. 如有任何查詢，請致電28338181與食品安全廳聯絡。​​\u003c/span>\u003c/p>\u003c/div>\u003c/div>\u003c/div>\u003c/td>\u003c/tr>\u003c/tbody>\u003c/table>\u003c/div>\u003cp>\u003cbr>\u003c/p>\u003c/div>","alertPDFZh":"https://www.iam.gov.mo/ShowFile.ashx?p=foodsafetyinfo/List54/402_0887154a0ee243af816f4bc33b99fa72.pdf","photo":"https://www.iam.gov.mo/ShowFile.ashx?p=foodsafetyinfo/List54/402_918c852ef4b64c007bc6609ad2158dcf.jpg,https://www.iam.gov.mo/ShowFile.ashx?p=foodsafetyinfo/List54/402_7e92cb707482dbb79eb26a9aa25881ff.jpg"}]};
-
-</script>
-<script>
-/**
- * macau-foodalert-widget.js
- * 「澳門食品預警資訊」網站小組件（繁體中文）
- *
- * 資料來源：澳門特別行政區政府數據開放平台／市政署「食品預警」
- *   目錄 API：https://api.data.gov.mo/document/download/b2290058-1cc9-4933-9bae-15af56552e5d
- *             ?token=...&isNeedFile=0&lang=TC   → file[] / dataDir[] / url[]
- *   檔案 API：同一路徑 &isNeedFile=1            → ZIP（readme.json + foodalert.json）
- *
- * 技術備註：
- *   - 檔案 API 加上 &lang=TC 會回 { "msg": "內部錯誤", "code": 1 }，故下載檔案時省略 lang。
- *   - 平台約有三分之一請求回「內部錯誤」，因此以重試 3 次處理；再失敗則降級顯示本機快取。
- *   - foodalert.json 內每筆紀錄提供 Zh（繁體）／Cn（簡體）／Pt／En 四組欄位，本元件只取 Zh。
- *   - ZIP 內的檔案以 DEFLATE 壓縮，瀏覽器端以 DecompressionStream('deflate-raw') 解開，
- *     不需要任何第三方函式庫；舊瀏覽器不解壓時仍可顯示本機快取資料。
- *
- * 可用屬性：limit（預設顯示 5 宗）／refresh（秒，預設 300）／theme／title／hide-footer
- * 公開方法：refresh()
- * 對外事件：macau-foodalert:update、macau-foodalert:error（bubbles + composed）
- */
-(function () {
-  'use strict';
-
-  if (window.customElements && window.customElements.get('macau-foodalert-widget')) return;
-
-  var DATA_ID = 'b2290058-1cc9-4933-9bae-15af56552e5d';
-  var TOKEN = 'g9MPxYmUloV6AusgTLbYJz1PvlvJ9wo9';
-  var API_BASE = 'https://api.data.gov.mo/document/download/' + DATA_ID;
-  var DIR_URL = API_BASE + '?token=' + TOKEN + '&isNeedFile=0&lang=TC';
-  var FILE_URL = API_BASE + '?token=' + TOKEN + '&isNeedFile=1';
-  var DATA_FILE = 'foodalert.json';
-  var IAM_URL = 'https://www.iam.gov.mo/foodsafety/';
-  var MACAU_TZ = 'Asia/Macau';
-  var STORE_DATA = 'macau-foodalert-cache-v1';
-  var FIELDS = [
-    'no', 'pubDate', 'titleZh', 'foodProductsZh', 'durabilityIndicationZh',
-    'sourceZh', 'reasonsZh', 'adviceZh', 'alertPDFZh', 'photo'
-  ];
-
-  function esc(s) {
-    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
-      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
-    });
-  }
-  function clamp(n, min, max, fallback) {
-    n = parseInt(n, 10);
-    return isFinite(n) ? Math.min(max, Math.max(min, n)) : fallback;
-  }
-  function pad(n) { return String(n).padStart(2, '0'); }
-
-  function macauClock(date) {
-    try {
-      return new Intl.DateTimeFormat('zh-Hant', {
-        timeZone: MACAU_TZ, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
-      }).format(date || new Date());
-    } catch (e) {
-      var d = new Date((date || new Date()).getTime() + 8 * 3600 * 1000);
-      return pad(d.getUTCHours()) + ':' + pad(d.getUTCMinutes()) + ':' + pad(d.getUTCSeconds());
-    }
-  }
-  function fmtDate(s) {
-    var m = String(s || '').match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
-    return m ? m[1] + ' 年 ' + Number(m[2]) + ' 月 ' + Number(m[3]) + ' 日' : (String(s || '').slice(0, 10) || '—');
-  }
-  function fmtShort(s) {
-    var m = String(s || '').match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
-    return m ? m[1] + '/' + pad(m[2]) + '/' + pad(m[3]) : '—';
-  }
-
-  /** 官方欄位是 HTML 片段；轉為純文字行，避免把外部 HTML 直接寫入頁面。 */
-  function plainLines(html) {
-    var s = String(html == null ? '' : html)
-      .replace(/<br\s*\/?>/gi, '\n')
-      .replace(/<\/(?:div|p|li|tr|h[1-6]|ul|ol|table)>/gi, '\n')
-      .replace(/<[^>]*>/g, '')
-      .replace(/&nbsp;|&#0*160;/gi, ' ')
-      .replace(/&lt;/gi, '<')
-      .replace(/&gt;/gi, '>')
-      .replace(/&quot;/gi, '"')
-      .replace(/&#0*39;|&apos;/gi, "'")
-      .replace(/&amp;/gi, '&')
-      .replace(/[\u200b\ufeff]/g, '')
-      .replace(/[ \t]+/g, ' ')
-      .replace(/[ \t]*\n[ \t]*/g, '\n')
-      .replace(/\n{2,}/g, '\n')
-      .trim();
-    return s ? s.split('\n').map(function (x) { return x.trim(); }).filter(Boolean) : [];
-  }
-  function urlsIn(html) {
-    var text = String(html || '').replace(/[\u200b\ufeff]/g, '');
-    var out = [], re = /https?:\/\/[^\s"'<>\\)]+/gi, m;
-    while ((m = re.exec(text)) && out.length < 3) {
-      var u = m[0].replace(/[.,;:]+$/, '');
-      if (out.indexOf(u) < 0) out.push(u);
-    }
-    return out;
-  }
-  function safeUrl(u) {
-    u = String(u || '').trim();
-    return /^https?:\/\//i.test(u) ? u : '';
-  }
-  function normalizeRow(r) {
-    var o = {};
-    r = r || {};
-    FIELDS.forEach(function (k) { o[k] = r[k] == null ? '' : String(r[k]); });
-    return o;
-  }
-  function sortRows(rows) {
-    return (rows || []).map(normalizeRow)
-      .filter(function (r) { return r.titleZh || r.no; })
-      .sort(function (a, b) {
-        var da = String(a.pubDate).slice(0, 10), db = String(b.pubDate).slice(0, 10);
-        if (da !== db) return db < da ? -1 : 1;
-        return String(b.no).localeCompare(String(a.no), 'zh-Hant', { numeric: true });
-      });
-  }
-
-  function fetchBuffer(url, ms) {
-    var ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
-    var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, ms || 14000);
-    var opts = { method: 'GET', cache: 'no-store', credentials: 'omit' };
-    if (ctrl) opts.signal = ctrl.signal;
-    return fetch(url, opts).then(function (r) {
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      return r.arrayBuffer();
-    }).then(function (buf) {
-      clearTimeout(timer);
-      return buf;
-    }, function (err) {
-      clearTimeout(timer);
-      throw err;
-    });
-  }
-  function retry(fn, times) {
-    var attempt = 0;
-    function run() {
-      attempt++;
-      return fn().catch(function (err) {
-        if (attempt >= times) throw err;
-        return new Promise(function (resolve) { setTimeout(resolve, 280 * attempt); }).then(run);
-      });
-    }
-    return run();
-  }
-  function decode(buf) {
-    return new TextDecoder('utf-8').decode(new Uint8Array(buf)).replace(/^\ufeff/, '');
-  }
-
-  /** 讀取 ZIP 中央目錄，取出指定檔案並以原生 DecompressionStream 解 DEFLATE。 */
-  function unzipText(buf, wanted) {
-    var dv = new DataView(buf), u8 = new Uint8Array(buf), dec = new TextDecoder('utf-8');
-    var eocd = -1, min = Math.max(0, buf.byteLength - 65557);
-    for (var i = buf.byteLength - 22; i >= min; i--) {
-      if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
-    }
-    if (eocd < 0) throw new Error('資料檔格式不正確');
-    var count = dv.getUint16(eocd + 10, true);
-    var off = dv.getUint32(eocd + 16, true);
-    for (var n = 0; n < count; n++) {
-      if (dv.getUint32(off, true) !== 0x02014b50) throw new Error('資料檔目錄損毀');
-      var method = dv.getUint16(off + 10, true);
-      var compSize = dv.getUint32(off + 20, true);
-      var nameLen = dv.getUint16(off + 28, true);
-      var extraLen = dv.getUint16(off + 30, true);
-      var commentLen = dv.getUint16(off + 32, true);
-      var local = dv.getUint32(off + 42, true);
-      var name = dec.decode(u8.subarray(off + 46, off + 46 + nameLen)).replace(/^\/+/, '');
-      if (name === wanted) {
-        var ln = dv.getUint16(local + 26, true), le = dv.getUint16(local + 28, true);
-        var start = local + 30 + ln + le;
-        var bytes = u8.subarray(start, start + compSize);
-        if (method === 0) return Promise.resolve(dec.decode(bytes));
-        if (method !== 8) throw new Error('資料檔使用不支援的壓縮格式');
-        if (typeof DecompressionStream === 'undefined') throw new Error('瀏覽器不支援解壓資料檔');
-        var ds;
-        try { ds = new DecompressionStream('deflate-raw'); }
-        catch (e) { throw new Error('瀏覽器不支援解壓資料檔'); }
-        var stream = new Blob([bytes]).stream().pipeThrough(ds);
-        return new Response(stream).arrayBuffer().then(function (out) {
-          return dec.decode(new Uint8Array(out));
-        });
-      }
-      off += 46 + nameLen + extraLen + commentLen;
-    }
-    throw new Error('資料檔中找不到 ' + wanted);
-  }
-
-  function parseRows(text) {
-    var raw = JSON.parse(String(text).replace(/^\ufeff/, ''));
-    var arr = Array.isArray(raw) ? raw : (raw && Array.isArray(raw.items) ? raw.items : null);
-    if (!arr) throw new Error('官方資料不是預期的清單格式');
-    return sortRows(arr);
-  }
-
-  var STYLE = `
-    :host {
-      --fa-bg: #101a2b;
-      --fa-surface: #17243a;
-      --fa-surface-2: #1d2c46;
-      --fa-border: #2b3c58;
-      --fa-text: #eef4ff;
-      --fa-muted: #93a7c4;
-      --fa-faint: #6f86a6;
-      --fa-accent: #55d6b5;
-      --fa-alert: #f08080;
-      --fa-warn: #f08b7b;
-      --fa-radius: 16px;
-      display: block;
-      color: var(--fa-text);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", "Noto Sans TC", "PingFang TC", sans-serif;
-      font-size: 16px;
-      line-height: 1.55;
-      contain: layout style;
-    }
-    :host([data-theme="light"]) {
-      --fa-bg: #f5f8fd; --fa-surface: #ffffff; --fa-surface-2: #f0f4fa;
-      --fa-border: #dce5f1; --fa-text: #16233a; --fa-muted: #53688a;
-      --fa-faint: #7c90ad; --fa-accent: #0f8c72; --fa-alert: #b8443c; --fa-warn: #b8443c;
-    }
-    @media (prefers-color-scheme: light) {
-      :host([data-theme="auto"]) {
-        --fa-bg: #f5f8fd; --fa-surface: #ffffff; --fa-surface-2: #f0f4fa;
-        --fa-border: #dce5f1; --fa-text: #16233a; --fa-muted: #53688a;
-        --fa-faint: #7c90ad; --fa-accent: #0f8c72; --fa-alert: #b8443c; --fa-warn: #b8443c;
-      }
-    }
-    *, *::before, *::after { box-sizing: border-box; }
-    .wrap {
-      background: var(--fa-bg); border: 1px solid var(--fa-border);
-      border-radius: var(--fa-radius); padding: 16px 15px 13px;
-      box-shadow: 0 12px 32px rgba(0,0,0,.16);
-      container-type: inline-size;
-    }
-    .hd { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; flex-wrap: wrap; }
-    .hd h1 { margin: 0; font-size: 19px; font-weight: 700; letter-spacing: .02em; }
-    .hd .sub { margin: 4px 0 0; font-size: 13.5px; color: var(--fa-muted); }
-    .hd-right { text-align: right; font-variant-numeric: tabular-nums; }
-    .status { margin-top: 4px; font-size: 13px; color: var(--fa-accent); font-weight: 600; }
-    .status.cache { color: var(--fa-alert); }
-    .kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 14px 0 12px; }
-    .kpi { background: var(--fa-surface); border: 1px solid var(--fa-border); border-radius: 12px; padding: 10px 12px; min-width: 0; }
-    .kpi span { display: block; font-size: 12.5px; color: var(--fa-muted); }
-    .kpi b { display: block; margin-top: 2px; font-size: 20px; line-height: 1.25; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .kpi b small { font-size: 13px; font-weight: 600; color: var(--fa-muted); margin-left: 3px; }
-    .kpi.hi b { color: var(--fa-alert); }
-    .notice { margin: 0 0 12px; padding: 8px 11px; border-radius: 9px; font-size: 13.5px;
-      background: color-mix(in srgb, var(--fa-warn) 12%, transparent); color: var(--fa-warn); }
-    .notice.stale { background: color-mix(in srgb, var(--fa-alert) 12%, transparent); color: var(--fa-alert); }
-    .list { display: grid; gap: 9px; }
-    .item { background: var(--fa-surface); border: 1px solid var(--fa-border); border-radius: 12px; overflow: hidden; }
-    .item[open] { border-color: color-mix(in srgb, var(--fa-alert) 48%, var(--fa-border)); }
-    .item > summary {
-      display: grid; grid-template-columns: 72px minmax(0, 1fr) 22px; gap: 12px;
-      align-items: center; padding: 11px 13px; cursor: pointer; list-style: none;
-      transition: background-color .15s;
-    }
-    .item > summary::-webkit-details-marker { display: none; }
-    .item > summary:hover { background: color-mix(in srgb, var(--fa-surface-2) 70%, transparent); }
-    .date { text-align: center; border-right: 1px solid var(--fa-border); padding-right: 9px; font-variant-numeric: tabular-nums; }
-    .date b { display: block; font-size: 17px; font-weight: 700; line-height: 1.2; }
-    .date small { display: block; font-size: 12px; color: var(--fa-faint); margin-top: 2px; }
-    .head { min-width: 0; }
-    .title { display: block; font-size: 16px; font-weight: 700; line-height: 1.45; }
-    .meta { display: block; font-size: 13px; color: var(--fa-muted); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .tag { display: inline-block; margin-left: 8px; padding: 1px 7px; border-radius: 999px; font-size: 11.5px; font-weight: 700;
-      color: var(--fa-alert); background: color-mix(in srgb, var(--fa-alert) 15%, transparent); vertical-align: 1px; }
-    .chev { width: 18px; height: 18px; color: var(--fa-faint); transition: transform .25s; }
-    .item[open] .chev { transform: rotate(180deg); color: var(--fa-alert); }
-    .detail { padding: 0 13px 14px; border-top: 1px solid var(--fa-border); }
-    .blocks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
-    .block { background: var(--fa-surface-2); border-radius: 10px; padding: 10px 12px; min-width: 0; }
-    .block h3 { margin: 0 0 6px; font-size: 13.5px; color: var(--fa-accent); letter-spacing: .02em; }
-    .block p { margin: 0; font-size: 14px; white-space: pre-line; overflow-wrap: anywhere; }
-    .actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 12px; }
-    .btn { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 9px;
-      border: 1px solid color-mix(in srgb, var(--fa-alert) 38%, var(--fa-border));
-      background: color-mix(in srgb, var(--fa-alert) 12%, transparent);
-      color: var(--fa-alert); font-size: 13.5px; font-weight: 700; text-decoration: none; }
-    .btn:hover { background: color-mix(in srgb, var(--fa-alert) 22%, transparent); }
-    .btn.plain { color: var(--fa-muted); border-color: var(--fa-border); background: transparent; }
-    .photos { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 12px; }
-    .photos img { width: 108px; height: 82px; object-fit: cover; border-radius: 9px; border: 1px solid var(--fa-border); background: var(--fa-surface-2); }
-    .more { margin-top: 12px; text-align: center; }
-    .more button { padding: 7px 16px; border-radius: 999px; cursor: pointer; font: inherit; font-size: 13.5px; font-weight: 600;
-      color: var(--fa-muted); background: var(--fa-surface-2); border: 1px solid var(--fa-border); }
-    .more button:hover { color: var(--fa-accent); border-color: var(--fa-accent); }
-    .empty, .loading { text-align: center; color: var(--fa-muted); font-size: 14px; padding: 18px 4px; }
-    .skeleton { height: 62px; border-radius: 12px; background: linear-gradient(90deg, var(--fa-surface-2), color-mix(in srgb, var(--fa-surface-2) 60%, var(--fa-muted) 40%), var(--fa-surface-2)); background-size: 200% 100%; animation: shimmer 1.4s infinite; }
-    .skeleton + .skeleton { margin-top: 9px; }
-    @keyframes shimmer { 0% { background-position: 200% 0 } 100% { background-position: -200% 0 } }
-    footer { margin-top: 13px; padding-top: 10px; border-top: 1px solid var(--fa-border); font-size: 12.5px; color: var(--fa-faint); display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
-    .links { display: flex; gap: 14px; flex-wrap: wrap; }
-    a { color: var(--fa-muted); text-decoration: none; border-bottom: 1px dotted currentColor; }
-    a:hover { color: var(--fa-accent); }
-    @container (max-width: 760px) { .blocks { grid-template-columns: 1fr; } }
-    @container (max-width: 560px) {
-      .hd { flex-direction: column; gap: 7px; }
-      .hd-right { text-align: left; }
-      .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .kpi:last-child { grid-column: 1 / -1; }
-      .kpi b { font-size: 16px; }
-      .item > summary { grid-template-columns: 62px minmax(0, 1fr) 18px; gap: 9px; padding: 10px 11px; }
-      .title { font-size: 15px; white-space: normal; }
-    }
-  `;
-
-  class MacauFoodAlertWidget extends HTMLElement {
-    static get observedAttributes() {
-      return ['limit', 'refresh', 'theme', 'title', 'hide-footer'];
-    }
-
-    constructor() {
-      super();
-      this.attachShadow({ mode: 'open' });
-      this._cfg = {};
-      this._data = null;
-      this._source = 'loading';
-      this._dirInfo = null;
-      this._cachedAt = '';
-      this._errorMsg = '';
-      this._updatedAt = null;
-      this._loading = false;
-      this._showAll = false;
-      this._open = {};
-      this._bound = false;
-      this._timer = null;
-      this._clockTimer = null;
-      this._nextAt = 0;
-    }
-
-    get cfg() {
-      var a = function (n) { return this.getAttribute(n); }.bind(this);
-      return {
-        limit: clamp(a('limit'), 1, 30, 5),
-        refresh: clamp(a('refresh'), 60, 3600, 300),
-        theme: a('theme') || 'dark',
-        title: a('title') || '澳門食品預警資訊',
-        hideFooter: this.hasAttribute('hide-footer')
-      };
-    }
-
-    connectedCallback() {
-      this._cfg = this.cfg;
-      this.setAttribute('data-theme', this._cfg.theme);
-      var seed = this._readCache() || window.MACAU_FOODALERT_SNAPSHOT;
-      if (seed && Array.isArray(seed.items) && seed.items.length) {
-        this._data = sortRows(seed.items);
-        this._source = 'cache';
-        this._cachedAt = String(seed.savedAt || seed.capturedAt || '');
-      }
-      if (seed && seed.dirInfo) this._dirInfo = seed.dirInfo;
-      this._shell();
-      this._startTimers();
-      this.refresh();
-    }
-
-    disconnectedCallback() {
-      clearInterval(this._timer);
-      clearInterval(this._clockTimer);
-    }
-
-    attributeChangedCallback(name, oldVal, newVal) {
-      if (oldVal === newVal || !this.isConnected) return;
-      this._cfg = this.cfg;
-      this.setAttribute('data-theme', this._cfg.theme);
-      if (name === 'refresh') this._startTimers();
-      this._shell();
-      if (this._data) this._paint();
-    }
-
-    _startTimers() {
-      clearInterval(this._timer);
-      var self = this;
-      this._timer = setInterval(function () {
-        if (!document.hidden) self.refresh();
-      }, this._cfg.refresh * 1000);
-    }
-
-    _readCache() {
-      try {
-        var raw = localStorage.getItem(STORE_DATA);
-        return raw ? JSON.parse(raw) : null;
-      } catch (e) { return null; }
-    }
-
-    _saveCache(rows) {
-      try {
-        localStorage.setItem(STORE_DATA, JSON.stringify({
-          savedAt: new Date().toISOString(), items: rows, dirInfo: this._dirInfo
-        }));
-      } catch (e) { /* 私隱模式或容量不足時略過 */ }
-    }
-
-    _shell() {
-      var cfg = this._cfg;
-      this.shadowRoot.innerHTML = '<style>' + STYLE + '</style>' +
-        '<div class="wrap" role="region" aria-label="' + esc(cfg.title) + '">' +
-        '  <div class="hd">' +
-        '    <div><h1>' + esc(cfg.title) + '</h1>' +
-        '      <p class="sub">市政署 · 澳門政府數據開放平台 · 繁體中文</p></div>' +
-        '    <div class="hd-right">' +
-        '      <div class="status" data-status>正在取得官方資料…</div></div>' +
-        '  </div>' +
-        '  <div class="kpis">' +
-        '    <div class="kpi"><span>已收錄預警</span><b data-kpi-count>—</b></div>' +
-        '    <div class="kpi hi"><span>最新發出</span><b data-kpi-latest>—</b></div>' +
-        '    <div class="kpi"><span>資料集更新</span><b data-kpi-update>—</b></div>' +
-        '  </div>' +
-        '  <div data-notice></div>' +
-        '  <div class="list" data-list></div>' +
-        '  <div class="more" data-more></div>' +
-        (cfg.hideFooter ? '' :
-          '  <footer><span>資料來源：市政署／澳門政府數據開放平台（食品預警）</span>' +
-          '    <span class="links"><a href="' + IAM_URL + '" target="_blank" rel="noopener noreferrer">食品安全資訊網 ↗</a></span></footer>') +
-        '</div>';
-
-      if (!this._bound) {
-        this._bound = true;
-        var self = this, sr = this.shadowRoot;
-        /* toggle 不會冒泡，須以 capture 階段攔截 */
-        sr.addEventListener('toggle', function (e) {
-          var d = e.target;
-          if (!d || !d.classList || !d.classList.contains('item')) return;
-          var key = d.getAttribute('data-no') || '';
-          if (d.open) self._open[key] = true;
-          else delete self._open[key];
-        }, true);
-        sr.addEventListener('click', function (e) {
-          var btn = e.target && e.target.closest ? e.target.closest('[data-more-btn]') : null;
-          if (!btn) return;
-          self._showAll = !self._showAll;
-          self._paint();
-        });
-        sr.addEventListener('error', function (e) {
-          if (e.target && e.target.tagName === 'IMG') e.target.style.display = 'none';
-        }, true);
-      }
-      if (this._data) this._paint();
-      else this._skeleton();
-    }
-
-    _skeleton() {
-      var html = '';
-      for (var i = 0; i < this._cfg.limit; i++) html += '<div class="skeleton"></div>';
-      this.shadowRoot.querySelector('[data-list]').innerHTML = html;
-    }
-
-    /** 官方目錄 API：取得資料集名稱與更新時間（失敗不影響主要資料）。 */
-    _loadDirectory() {
-      var self = this;
-      return retry(function () {
-        return fetchBuffer(DIR_URL, 10000).then(function (buf) {
-          var obj = JSON.parse(decode(buf));
-          if (obj && obj.code) throw new Error(obj.msg || '平台回應異常');
-          var d = obj && obj.dataDir && obj.dataDir[0];
-          var f = obj && obj.file && obj.file[0];
-          if (!d && !f) throw new Error('目錄資料不完整');
-          return {
-            name: (d && d.name) || (f && f.openName) || '食品預警',
-            updateTime: (d && d.updateTime) || '',
-            lastUpdateTime: (f && f.lastUpdateTime) || ''
-          };
-        });
-      }, 3).then(function (info) {
-        self._dirInfo = info;
-        if (self._data) self._saveCache(self._data);
-        self._paint();
-      }).catch(function () { /* 目錄資訊屬輔助，失敗時沿用快取 */ });
-    }
-
-    /** 公開方法：立即重新向政府平台抓取資料。 */
-    refresh() {
-      if (this._loading) return;
-      var self = this;
-      this._loading = true;
-      this._nextAt = Date.now() + this._cfg.refresh * 1000;
-      this._loadDirectory();
-
-      retry(function () {
-        return fetchBuffer(FILE_URL, 15000).then(function (buf) {
-          var head = new Uint8Array(buf, 0, Math.min(2, buf.byteLength));
-          if (!(head[0] === 0x50 && head[1] === 0x4b)) {
-            var msg = '';
-            try { var j = JSON.parse(decode(buf)); msg = j && j.msg ? j.msg : ''; } catch (e) {}
-            throw new Error('官方平台回應異常' + (msg ? '（' + msg + '）' : ''));
-          }
-          return unzipText(buf, DATA_FILE);
-        }).then(function (text) { return parseRows(text); });
-      }, 3).then(function (rows) {
-        if (!rows.length) throw new Error('官方資料中沒有預警紀錄');
-        self._data = rows;
-        self._source = 'live';
-        self._updatedAt = Date.now();
-        self._errorMsg = '';
-        self._saveCache(rows);
-        self._paint();
-        self.dispatchEvent(new CustomEvent('macau-foodalert:update', {
-          bubbles: true, composed: true,
-          detail: {
-            count: rows.length, latest: String(rows[0].pubDate || '').slice(0, 10),
-            updatedAt: self._updatedAt, source: 'live'
-          }
-        }));
-      }).catch(function (err) {
-        var msg = err && err.name === 'AbortError' ? '連線逾時' : (err && err.message ? err.message : '未知錯誤');
-        self._errorMsg = msg;
-        self._paint();
-        self.dispatchEvent(new CustomEvent('macau-foodalert:error', {
-          bubbles: true, composed: true, detail: { message: msg }
-        }));
-      }).then(function () { self._loading = false; });
-    }
-
-    _detailHtml(r) {
-      var blocks = [
-        ['產品資料', r.foodProductsZh],
-        ['保存期／此日期前最佳', r.durabilityIndicationZh],
-        ['預警原因', r.reasonsZh],
-        ['當局呼籲', r.adviceZh],
-        ['資料來源', r.sourceZh]
-      ];
-      var html = '<div class="blocks">';
-      blocks.forEach(function (b) {
-        var lines = plainLines(b[1]);
-        if (!lines.length) return;
-        html += '<section class="block"><h3>' + esc(b[0]) + '</h3><p>' +
-          lines.map(function (x) { return esc(x); }).join('\n') + '</p></section>';
-      });
-      html += '</div>';
-
-      var actions = '';
-      var pdf = safeUrl(r.alertPDFZh);
-      if (pdf) {
-        actions += '<a class="btn" href="' + esc(pdf) + '" target="_blank" rel="noopener noreferrer">開啟預警通告（PDF）↗</a>';
-      }
-      urlsIn(r.sourceZh).forEach(function (u) {
-        actions += '<a class="btn plain" href="' + esc(safeUrl(u)) + '" target="_blank" rel="noopener noreferrer">來源公告 ↗</a>';
-      });
-      if (actions) html += '<div class="actions">' + actions + '</div>';
-
-      var photos = String(r.photo || '').split(/[,;\s]+/).map(safeUrl).filter(Boolean).slice(0, 3);
-      if (photos.length) {
-        html += '<div class="photos">' + photos.map(function (u) {
-          return '<img src="' + esc(u) + '" alt="涉事產品圖片" loading="lazy" decoding="async" referrerpolicy="no-referrer">';
-        }).join('') + '</div>';
-      }
-      return html;
-    }
-
-    _itemHtml(r, index) {
-      var m = String(r.pubDate || '').match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
-      var day = m ? pad(m[2]) + '/' + pad(m[3]) : '—';
-      var year = m ? m[1] : '';
-      var product = plainLines(r.foodProductsZh)[0] || '';
-      var meta = '預警編號 ' + esc(r.no || '—');
-      if (product) meta += ' · ' + esc(product);
-      var open = this._open[r.no] ? ' open' : '';
-      return '<details class="item" data-no="' + esc(r.no) + '"' + open + '>' +
-        '<summary>' +
-        '  <span class="date"><b>' + day + '</b><small>' + year + '</small></span>' +
-        '  <span class="head"><span class="title">' + esc(r.titleZh || '（沒有標題）') +
-        (index === 0 ? '<span class="tag">最新</span>' : '') + '</span>' +
-        '    <span class="meta">' + meta + '</span></span>' +
-        '  <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>' +
-        '</summary>' +
-        '<div class="detail">' + this._detailHtml(r) + '</div>' +
-        '</details>';
-    }
-
-    _paint() {
-      var sr = this.shadowRoot;
-      if (!sr.querySelector('[data-list]')) return;
-      var rows = this._data || [];
-      var cfg = this._cfg;
-      var shown = this._showAll ? rows : rows.slice(0, cfg.limit);
-      var self = this;
-
-      sr.querySelector('[data-kpi-count]').innerHTML = rows.length
-        ? esc(rows.length) + '<small>宗</small>' : '—';
-      sr.querySelector('[data-kpi-latest]').textContent = rows.length
-        ? fmtShort(rows[0].pubDate) : '—';
-      sr.querySelector('[data-kpi-update]').textContent = this._dirInfo && this._dirInfo.updateTime
-        ? fmtShort(this._dirInfo.updateTime) : (this._dirInfo && this._dirInfo.lastUpdateTime ? fmtShort(this._dirInfo.lastUpdateTime) : '—');
-
-      var status = sr.querySelector('[data-status]');
-      if (this._source === 'live') {
-        status.className = 'status';
-        status.textContent = '官方資料 · 更新於 ' + macauClock(this._updatedAt ? new Date(this._updatedAt) : null);
-      } else if (this._errorMsg) {
-        status.className = 'status cache';
-        status.textContent = '本機存檔 · 官方更新失敗';
-      } else {
-        status.className = 'status cache';
-        status.textContent = '本機存檔 · 正在向官方更新';
-      }
-
-      var notice = '';
-      if (this._errorMsg) {
-        var stamp = this._cachedAt ? '（存檔時間 ' + esc(fmtDate(this._cachedAt)) + '）' : '';
-        notice = rows.length
-          ? '<div class="notice stale">暫時無法更新（' + esc(this._errorMsg) + '），以下為本機存檔資料' + stamp + '。</div>'
-          : '<div class="notice">無法取得食品預警資料（' + esc(this._errorMsg) + '），請稍後按頁首「重新整理」重試。</div>';
-      }
-      sr.querySelector('[data-notice]').innerHTML = notice;
-
-      var list = sr.querySelector('[data-list]');
-      if (!rows.length && !this._loading && !this._errorMsg) {
-        list.innerHTML = '<div class="empty">目前沒有食品預警紀錄</div>';
-      } else if (!rows.length) {
-        list.innerHTML = '<div class="loading">正在讀取官方食品預警資料…</div>';
-      } else {
-        list.innerHTML = shown.map(function (r, i) { return self._itemHtml(r, i); }).join('');
-      }
-
-      var more = sr.querySelector('[data-more]');
-      more.innerHTML = rows.length > cfg.limit
-        ? '<button type="button" data-more-btn>' +
-          (this._showAll ? '只顯示最近 ' + cfg.limit + ' 宗' : '顯示全部 ' + rows.length + ' 宗預警') +
-          '</button>'
-        : '';
-    }
-  }
-
-  if (window.customElements) window.customElements.define('macau-foodalert-widget', MacauFoodAlertWidget);
 })();
 
 </script>
@@ -4873,7 +4145,7 @@ window.MACAU_FOODALERT_SNAPSHOT = {"capturedAt":"2026-11-08T17:16:34+08:00","lat
       var a = this.getAttribute.bind(this);
       return {
         title: a('title') || '漫步澳門街 · 街道歷史',
-        theme: a('theme') || 'dark',
+        theme: a('theme') || 'light',
         refresh: clampInt(a('refresh'), 30, 3600, 300),
         appcode: a('appcode') || DEFAULT_APPCODE,
         limit: clampInt(a('limit'), 4, 60, PAGE_SIZE)
@@ -4911,6 +4183,8 @@ window.MACAU_FOODALERT_SNAPSHOT = {"capturedAt":"2026-11-08T17:16:34+08:00","lat
 
     _startTimer() {
       clearInterval(this._timer);
+      /* no-auto：只在進入網頁時讀取一次，不啟動每 5 分鐘的自動重整。 */
+      if (this.hasAttribute('no-auto')) return;
       var self = this;
       this._timer = setInterval(function () { self.refresh(); }, this._cfg.refresh * 1000);
     }
@@ -5359,7 +4633,7 @@ window.MACAU_FOODALERT_SNAPSHOT = {"capturedAt":"2026-11-08T17:16:34+08:00","lat
     .search input { flex: 1 1 auto; min-width: 0; border: 0; outline: none; background: transparent;
       color: var(--c-tx); font: inherit; font-size: 15px; }
     .search input::placeholder { color: var(--c-fa); }
-    /* 分類按鈕與搜尋框同軸置中；七枚等分固定一列，任何寬度都不換行 */
+    /* 分類按鈕與搜尋框同軸置中；七枚固定一列，任何寬度都不換行 */
     .chips { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr));
       gap: 7px; width: 100%; max-width: 780px; margin: 10px auto 0; }
     .chip { width: 100%; min-width: 0; display: inline-flex; align-items: center; justify-content: center;
@@ -5459,20 +4733,19 @@ window.MACAU_FOODALERT_SNAPSHOT = {"capturedAt":"2026-11-08T17:16:34+08:00","lat
       .item { padding: 10px 11px; }
       .item h4 { font-size: 14.5px; }
       .date { font-size: 11.5px; }
-      /* 七枚框的欄寬、間距與位置完全不變；只放大框內文字 */
-      .chips { grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; max-width: none; }
+      /* 七枚固定一列：縮減間距與內距，並給四字名稱較寬欄位，名稱一律不折行 */
+      .chips { grid-template-columns: minmax(0, 1fr) minmax(0, 1.32fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); gap: 1px; max-width: none; }
       .chip { width: 100%; min-width: 0; flex-direction: column; gap: 0;
-        padding: 3px 0; border-radius: 9px; font-size: clamp(10px, 3.45cqw, 13px); line-height: 1.05;
-        text-align: center; white-space: normal; overflow: hidden; }
-      /* 四字名稱在窄欄於框內折成兩行，不撐開欄寬、不改變框的排列 */
-      .chip .cn { display: block; white-space: normal; line-height: 1.05;
-        max-width: 100%; overflow-wrap: anywhere; text-wrap: balance; }
+        padding: 2px 0; border-radius: 9px; font-size: clamp(10px, 3.45cqw, 13px); line-height: 1.05;
+        text-align: center; white-space: nowrap; overflow: hidden; }
+      .chip .cn { display: block; white-space: nowrap; line-height: 1.05;
+        max-width: 100%; letter-spacing: -.02em; }
       .chip small { font-size: .85em; line-height: 1.05; font-weight: 700; }
       .focus-more { font-size: 12px; }
     }
     @container (max-width: 300px) {
-      .chips { gap: 2px; }
-      .chip { font-size: 10px; padding: 3px 0; }
+      .chips { gap: 1px; }
+      .chip { font-size: 10px; padding: 2px 0; }
       .chip small { font-size: 8.5px; }
     }
     @media (prefers-reduced-motion: reduce) {
@@ -5510,7 +4783,7 @@ window.MACAU_FOODALERT_SNAPSHOT = {"capturedAt":"2026-11-08T17:16:34+08:00","lat
       var a = this.getAttribute.bind(this);
       return {
         title: a('title') || '澳門旅遊快訊',
-        theme: a('theme') || 'dark',
+        theme: a('theme') || 'light',
         refresh: clampInt(a('refresh'), 30, 3600, 300),
         limit: clampInt(a('limit'), 3, 60, PAGE_SIZE)
       };
@@ -5546,6 +4819,8 @@ window.MACAU_FOODALERT_SNAPSHOT = {"capturedAt":"2026-11-08T17:16:34+08:00","lat
 
     _startTimer() {
       clearInterval(this._timer);
+      /* no-auto：只在進入網頁時讀取一次，不啟動每 5 分鐘的自動重整。 */
+      if (this.hasAttribute('no-auto')) return;
       var self = this;
       this._timer = setInterval(function () { self.refresh(); }, this._cfg.refresh * 1000);
     }
@@ -5824,13 +5099,15 @@ window.MACAU_FOODALERT_SNAPSHOT = {"capturedAt":"2026-11-08T17:16:34+08:00","lat
     { cat: '舞廳', api: DST_BASE + 'dst_nightclub' }
   ];
 
-  /* 頁尾兩個官方目錄的鏈結（順序：旅遊局、市政署） */
+  /* 頁尾官方目錄鏈結（順序：旅遊局、市政署） */
   var LINKS = [
     { key: 'dst', name: '旅遊局已領有准照之實體',
       href: 'https://www.dst.gov.mo/zh-hant/public-services/licensed-entities.html' },
-    /* 市政署查詢頁（app.iam.gov.mo）已被官方 WAF 攔截，改連政府開放數據平台的同一資料集 */
+    /* 市政署准照場所查詢頁：一般瀏覽器可直達（Spring Web Flow 先 302 設 Cookie）；
+       自動化工具若被 WAF 攔截，可改用開放數據平台同一數據集
+       https://data.gov.mo/Detail?id=9725f212-2fac-4f04-9d28-95ea97463a77 */
     { key: 'iam', name: '市政署已領有准照／登記證明的飲食飲料場所',
-      href: 'https://data.gov.mo/Detail?id=9725f212-2fac-4f04-9d28-95ea97463a77' }
+      href: 'https://app.iam.gov.mo/LFBPriceEnquiry/spring/main' }
   ];
 
   function esc(s) {
@@ -6172,7 +5449,7 @@ window.MACAU_FOODALERT_SNAPSHOT = {"capturedAt":"2026-11-08T17:16:34+08:00","lat
       var a = this.getAttribute.bind(this);
       return {
         title: a('title') || '旅遊局｜市政署牌照場所',
-        theme: a('theme') || 'dark',
+        theme: a('theme') || 'light',
         refresh: clampInt(a('refresh'), 30, 3600, 300),
         limit: clampInt(a('limit'), 4, 60, PAGE_SIZE)
       };
@@ -6217,6 +5494,8 @@ window.MACAU_FOODALERT_SNAPSHOT = {"capturedAt":"2026-11-08T17:16:34+08:00","lat
 
     _startTimer() {
       clearInterval(this._timer);
+      /* no-auto：只在進入網頁時讀取一次，不啟動每 5 分鐘的自動重整。 */
+      if (this.hasAttribute('no-auto')) return;
       var self = this;
       this._timer = setInterval(function () { self.refresh(); }, this._cfg.refresh * 1000);
     }
@@ -6444,6 +5723,7 @@ window.MACAU_FOODALERT_SNAPSHOT = {"capturedAt":"2026-11-08T17:16:34+08:00","lat
 })();
 </script>
 
+
 <script>
 (function () {
   'use strict';
@@ -6452,21 +5732,25 @@ window.MACAU_FOODALERT_SNAPSHOT = {"capturedAt":"2026-11-08T17:16:34+08:00","lat
   var acc = document.getElementById('arrivals-acc');
   var btn = document.getElementById('arrivals-btn');
   var panel = document.getElementById('arrivals-panel');
-  var widgets = document.querySelectorAll('macau-arrivals-widget, macau-departures-widget, macau-weather-widget, macau-warnings-widget, macau-foodalert-widget, macau-street-history-widget, macau-tour-widget, macau-registry-widget');
-  var STORE_THEME = 'macau-info-theme';
+  var widgets = document.querySelectorAll('macau-arrivals-widget, macau-departures-widget, macau-weather-widget, macau-warnings-widget, macau-street-history-widget, macau-tour-widget, macau-registry-widget');
+  /* 主題不記憶：每次載入一律淺色，深色僅能由按鈕手動切換。 */
 
-  /* ---------- 全站自動重整：所有元件統一每 5 分鐘一次 ----------
-     各 widget 以秒為單位的 refresh 屬性驅動自己的計時器；此處統一設定，
-     讓頁面載入後各元件的計時起點對齊，日後調整週期只需改這一個常數。 */
+  /* ---------- 自動重整：僅天氣預報與飛機起降每 5 分鐘一次 ----------
+     其餘分類（街道歷史、旅遊快訊、牌照場所）在 HTML 上標記 no-auto，
+     只在進入網頁時由各自的 connectedCallback 讀取一次；頁首重整按鈕仍可手動更新。
+     此處統一設定 refresh，讓需要定期更新的元件計時起點對齊。 */
   var AUTO_REFRESH_SEC = 300;
+  var AUTO_WIDGETS = ['macau-arrivals-widget', 'macau-departures-widget',
+                      'macau-weather-widget', 'macau-warnings-widget'];
   Array.prototype.forEach.call(widgets, function (w) {
+    if (AUTO_WIDGETS.indexOf(w.localName) < 0) return;
     if (w.getAttribute('refresh') !== String(AUTO_REFRESH_SEC)) {
       w.setAttribute('refresh', String(AUTO_REFRESH_SEC));
     }
   });
 
   /* ---------- 全站唯一的重新整理按鈕 ----------
-     一次觸發所有元件同時重整；並把各元件的計時器歸零，
+     一次觸發所有元件同時重整（手動）；並把需要定期更新的元件計時器歸零，
      讓下一次自動重整由這次手動更新起算，避免短時間內重複抓取。 */
   var refreshBtn = document.getElementById('global-refresh');
   var refreshLabel = refreshBtn.querySelector('[data-refresh-label]');
@@ -6475,7 +5759,6 @@ window.MACAU_FOODALERT_SNAPSHOT = {"capturedAt":"2026-11-08T17:16:34+08:00","lat
     'macau-departures:update', 'macau-departures:error',
     'macau-weather:update', 'macau-weather:error',
     'macau-warnings:update', 'macau-warnings:error',
-    'macau-foodalert:update', 'macau-foodalert:error',
     'macau-street:update', 'macau-street:error',
     'macau-tour:update', 'macau-tour:error',
     'macau-registry:update', 'macau-registry:error'
@@ -6530,9 +5813,12 @@ window.MACAU_FOODALERT_SNAPSHOT = {"capturedAt":"2026-11-08T17:16:34+08:00","lat
 
     Array.prototype.forEach.call(widgets, function (w) {
       if (typeof w.refresh === 'function') w.refresh();
-      /* 先設為不同值再設回，觸發各元件的 attributeChangedCallback 重啟計時器 */
-      w.setAttribute('refresh', String(AUTO_REFRESH_SEC + 1));
-      w.setAttribute('refresh', String(AUTO_REFRESH_SEC));
+      /* 只讓需要定期更新的分類重啟計時器；no-auto 分類不因此開始自動更新 */
+      if (AUTO_WIDGETS.indexOf(w.localName) >= 0) {
+        /* 先設為不同值再設回，觸發 attributeChangedCallback 重啟計時器 */
+        w.setAttribute('refresh', String(AUTO_REFRESH_SEC + 1));
+        w.setAttribute('refresh', String(AUTO_REFRESH_SEC));
+      }
     });
   }
 
@@ -6548,17 +5834,13 @@ window.MACAU_FOODALERT_SNAPSHOT = {"capturedAt":"2026-11-08T17:16:34+08:00","lat
     if (t) t.setAttribute('aria-label', theme === 'light' ? '切換為深色模式' : '切換為淺色模式');
   }
 
-  var saved = null;
-  try { saved = localStorage.getItem(STORE_THEME); } catch (e) {}
-  if (!saved) {
-    saved = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
-  }
-  applyTheme(saved);
+  /* 預設一律淺色：不跟隨系統深色偏好、不記憶上次選擇；
+     深色模式只能由使用者按下主題按鈕手動切換（重整頁面即回到淺色）。 */
+  applyTheme('light');
 
   document.getElementById('theme-toggle').addEventListener('click', function () {
     var next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
     applyTheme(next);
-    try { localStorage.setItem(STORE_THEME, next); } catch (e) {}
   });
 
   /* ---------- 開闔（各區塊各自獨立，預設收合） ---------- */
@@ -6595,7 +5877,7 @@ window.MACAU_FOODALERT_SNAPSHOT = {"capturedAt":"2026-11-08T17:16:34+08:00","lat
   /* ---------- 分類切換（預設只顯示「天氣預報」） ----------
      其餘分類的資料必須按下對應按鈕才會出現；切換時一併展開該分類的卡片，
      讓使用者按一次就能看到內容，不必再逐張點開。 */
-  var VIEWS = ['weather', 'flights', 'food', 'street', 'tour', 'registry'];
+  var VIEWS = ['weather', 'flights', 'street', 'tour', 'registry'];
   var viewButtons = document.querySelectorAll('.view-tab');
   var viewPanels = document.querySelectorAll('[data-view-panel]');
 
@@ -6663,7 +5945,7 @@ window.MACAU_FOODALERT_SNAPSHOT = {"capturedAt":"2026-11-08T17:16:34+08:00","lat
   /* ---------- 小工具狀態（無障礙提示） ---------- */
   ['macau-arrivals:error', 'macau-departures:error',
    'macau-weather:error', 'macau-warnings:error',
-   'macau-foodalert:error', 'macau-street:error', 'macau-tour:error', 'macau-registry:error'].forEach(function (name) {
+   'macau-street:error', 'macau-tour:error', 'macau-registry:error'].forEach(function (name) {
     document.addEventListener(name, function (e) {
       if (window.console) console.warn('[' + name + '] 資料更新失敗：', e.detail && e.detail.message);
     });
